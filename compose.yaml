@@ -19,10 +19,7 @@ services:
 
   execute:
     image: nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:main
-    entrypoint:
-      - /bin/bash
-      - -c
-      - sleep infinity
+    entrypoint: python src
     privileged: true
 
     environment:

@@ -12,7 +12,11 @@ def main():
     automations.
     """
 
-    os.system("COMPOSE_PROFILE=site CYCLE_MODE=up python /iac-configure/triggers/profile.py")
+    os.environ["SKIP_PAUSE"]      = "true"
+    os.environ["COMPOSE_PROFILE"] = "ping"
+    os.environ["CYCLE_MODE"]      = "up"
+
+    os.system("python /iac-configure/triggers/profile.py")
 
 if __name__ == "__main__":
     main()
