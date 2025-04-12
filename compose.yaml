@@ -1,0 +1,51 @@
+---
+services:
+
+  ###########################################################
+  # builder
+  ###########################################################
+
+  builder:
+    build:
+      context: .
+      tags:
+        - nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:main
+    profiles:
+      - builder
+
+  ###########################################################
+  # execute
+  ###########################################################
+
+  execute:
+    image: nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:main
+    entrypoint:
+      - /bin/bash
+      - -c
+      - sleep infinity
+    privileged: true
+
+    environment:
+      - TZ=America/Denver
+
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: false
+
+      - type: bind
+        source: ${IAC_CONFIGURE_PROJECT_DIR}/iac-configure
+        target: /iac-configure
+        read_only: true
+
+    networks:
+      - lazarus
+
+###########################################################
+# resources
+###########################################################
+
+networks:
+  lazarus:
+    name: lazarus
