@@ -5,7 +5,8 @@ FROM docker:28.0.4-dind-alpine3.21
 RUN \
     apk add \
         bash \
-        python3
+        python3 \
+        apcupsd
 
 WORKDIR /lazarus
 

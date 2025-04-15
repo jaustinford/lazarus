@@ -4,7 +4,7 @@ when to execute other docker container
 services on the system host.
 """
 
-import os
+import time
 
 def main():
     """
@@ -12,11 +12,8 @@ def main():
     automations.
     """
 
-    os.environ["SKIP_PAUSE"]      = "true"
-    os.environ["COMPOSE_PROFILE"] = "ping"
-    os.environ["CYCLE_MODE"]      = "up"
-
-    os.system("python /iac-configure/triggers/profile.py")
+    while True:
+        time.sleep(10)
 
 if __name__ == "__main__":
     main()
