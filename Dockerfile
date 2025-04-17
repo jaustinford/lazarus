@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG BUILD_ARCH
-
-FROM --platform=${BUILD_ARCH} docker:28.0.4-dind-alpine3.21
+FROM docker:28.0.4-dind-alpine3.21
 
 RUN \
     apk add \

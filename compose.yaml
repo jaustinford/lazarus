@@ -8,10 +8,8 @@ services:
   builder:
     build:
       context: .
-      args:
-        BUILD_ARCH: linux/arm64
       tags:
-        - nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:main
+        - docker01-teine.home.elysianskies.com:32501/elise/lazarus:main
     profiles:
       - builder
 
