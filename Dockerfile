@@ -15,3 +15,5 @@ COPY --chmod=755 \
 
 COPY conf/ups-0.conf /etc/apcupsd/ups-0.conf
 COPY conf/ups-1.conf /etc/apcupsd/ups-1.conf
+
+ENTRYPOINT [""]
