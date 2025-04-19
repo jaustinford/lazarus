@@ -1,11 +1,27 @@
 # syntax=docker/dockerfile:1
 
-FROM docker:28.0.4-dind-alpine3.21
+FROM python:3.9.19-bookworm
 
 RUN \
-    apk add \
-        bash \
-        python3 \
+    curl https://download.docker.com/linux/debian/gpg \
+        --output /etc/apt/keyrings/docker.asc
+
+RUN \
+    cat <<EOF > /etc/apt/sources.list.d/docker.list
+deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian/ bookworm stable
+EOF
+
+RUN \
+    apt update -y && \
+    apt install -y \
+        docker-ce \
+        docker-ce-cli \
+        containerd.io \
+        docker-buildx-plugin \
+        docker-compose-plugin    
+
+RUN \
+    apt install -y \
         apcupsd
 
 WORKDIR /lazarus
@@ -15,5 +31,3 @@ COPY --chmod=755 \
 
 COPY conf/ups-0.conf /etc/apcupsd/ups-0.conf
 COPY conf/ups-1.conf /etc/apcupsd/ups-1.conf
-
-ENTRYPOINT [""]
