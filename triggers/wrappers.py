@@ -32,15 +32,19 @@ def compose_build(build_profile: str):
 
     buildx_image = "buildx-builder"
 
+    os.environ["DOCKER_BUILDKIT"]          = "1"
+    os.environ["COMPOSE_DOCKER_CLI_BUILD"] = "1"
+
     os.system(
         "docker buildx create \
             --name " + buildx_image + " \
             --use"
     )
 
-    os.sytem(
-        "docker compose --profile " + build_profile + \
-        " build"
+    os.system(
+        "docker compose \
+            --profile " + build_profile + \
+            " build"
     )
 
     os.system("docker buildx stop " + buildx_image)
@@ -51,9 +55,6 @@ def compose_up(compose_profile: str, compose_method: str):
     Execute Docker Compose to deploy
     profile service.
     """
-
-    if compose_method == "build":
-        os.environ["DOCKER_BUILDKIT"] = "1"
 
     os.system(
         "docker compose" + \

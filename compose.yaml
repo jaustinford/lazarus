@@ -8,6 +8,8 @@ services:
   builder:
     build:
       context: .
+      args:
+        BUILD_ARCH: linux/arm64
       tags:
         - nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:main
       cache_from:
