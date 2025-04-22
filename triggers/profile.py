@@ -14,7 +14,6 @@ else:
 
 print(" ")
 
-wrappers.compose_build("builder")
 wrappers.compose_up(COMPOSE_PROFILE, "up --detach")
 
 try:
