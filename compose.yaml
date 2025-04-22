@@ -20,7 +20,7 @@ services:
         read_only: false
 
       - type: bind
-        source: ${IAC_CONFIGURE_PROJECT_DIR}/lazarus
+        source: ${LAZARUS_PROJECT_DIR}
         target: /lazarus
         read_only: true
 
