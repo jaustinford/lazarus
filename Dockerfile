@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG BUILD_ARCH
-
-FROM --platform=${BUILD_ARCH} python:3.9.19-bookworm
+FROM python:3.9.19-bookworm
 
 RUN \
     curl https://download.docker.com/linux/debian/gpg \

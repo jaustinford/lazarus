@@ -2,24 +2,6 @@
 services:
 
   ###########################################################
-  # builder
-  ###########################################################
-
-  builder:
-    build:
-      context: .
-      args:
-        BUILD_ARCH: linux/arm64
-      tags:
-        - nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:main
-      cache_from:
-        - type=registry,ref=nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:cache
-      cache_to:
-        - type=registry,ref=nexus-hosted.docker02-teine.home.elysianskies.com/elise/lazarus:cache,mode=max
-    profiles:
-      - builder
-
-  ###########################################################
   # execute
   ###########################################################
 
@@ -38,8 +20,8 @@ services:
         read_only: false
 
       - type: bind
-        source: ${IAC_CONFIGURE_PROJECT_DIR}/iac-configure
-        target: /iac-configure
+        source: ${IAC_CONFIGURE_PROJECT_DIR}/lazarus
+        target: /lazarus
         read_only: true
 
     devices:
