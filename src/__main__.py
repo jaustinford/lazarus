@@ -75,7 +75,7 @@ def main():
                 }
             )
 
-        print("test - " + combined_metrics)
+        print("test - " + str(combined_metrics))
 
         time.sleep(10)
 

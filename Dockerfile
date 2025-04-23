@@ -33,5 +33,5 @@ WORKDIR /lazarus
 COPY --chmod=755 \
     src/ ./src/
 
-COPY  --chmod=644 \
+COPY --chmod=644 \
     conf/ ./conf/
