@@ -62,6 +62,8 @@ def main():
     start_acpupsd("ups-1")
 
     while True:
+        print("test - " + str(find_ups_nisport("ups-0")))
+
         ups0_metrics = apc_get_metrics(
             find_ups_nisport("ups-0")
         )
