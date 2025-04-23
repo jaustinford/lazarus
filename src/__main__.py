@@ -8,6 +8,11 @@ import os
 import time
 from apcaccess import status
 
+APC_UPS = [
+    "ups-0",
+    "ups-1"
+]
+
 def start_acpupsd(ups_name: str):
     """
     Start apcupsd daemon and bind a
@@ -26,7 +31,10 @@ def apc_get_metrics(daemon_port: int):
     """
 
     ups_metrics = status.parse(
-        status.get(port=daemon_port)
+        status.get(
+            host="localhost",
+            port=daemon_port
+        )
     )
 
     return ups_metrics
@@ -58,23 +66,21 @@ def main():
     automations.
     """
 
-    start_acpupsd("ups-0")
-    start_acpupsd("ups-1")
+    for apc_ups in APC_UPS:
+        start_acpupsd(apc_ups)
 
     while True:
-        print("test - " + str(find_ups_nisport("ups-0")))
+        # ups0_metrics = apc_get_metrics(
+        #     find_ups_nisport("ups-0")
+        # )
 
-        ups0_metrics = apc_get_metrics(
-            find_ups_nisport("ups-0")
-        )
+        # ups1_metrics = apc_get_metrics(
+        #     find_ups_nisport("ups-1")
+        # )
 
-        ups1_metrics = apc_get_metrics(
-            find_ups_nisport("ups-1")
-        )
-
-        print(ups0_metrics)
-        print(" ")
-        print(ups1_metrics)
+        # print(ups0_metrics)
+        # print(" ")
+        # print(ups1_metrics)
 
         time.sleep(10)
 
