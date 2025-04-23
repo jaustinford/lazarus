@@ -7,6 +7,9 @@ services on the system host.
 import os
 import time
 import apc
+import logs
+
+logger = logs.logging.getLogger(__name__)
 
 FILE_PATH   = os.path.abspath(__file__)
 SRC_DIR     = os.path.dirname(FILE_PATH)
@@ -56,12 +59,12 @@ def combine_metrics():
     combined_metrics = []
 
     for conf_file in find_conf_files():
-        print("test 1")
+        logger.info("Polling metrics for conf file : %s", conf_file)
+
         ups_metrics = apc.get_metrics(
             find_ups_nisport(conf_file)
         )
 
-        print("test 2")
         combined_metrics.append(
             {
                 ups_metrics["UPSNAME"]: {
@@ -84,13 +87,10 @@ def main():
     for conf_file in find_conf_files():
         apc.start_daemon(conf_file)
 
-    print("test 3")
-
     while True:
         combined_metrics = combine_metrics()
 
-        print("test 4")
-        print("test - " + str(combined_metrics))
+        logger.info("Showing combined metrics : %s", combined_metrics)
 
         time.sleep(10)
 

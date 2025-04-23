@@ -18,7 +18,6 @@ def start_daemon(conf_file: str):
             -f " + conf_file
     )
 
-    print("test 5")
     time.sleep(10)
 
 def get_metrics(daemon_port: int):
@@ -34,5 +33,4 @@ def get_metrics(daemon_port: int):
         )
     )
 
-    print("test 6")
     return ups_metrics
