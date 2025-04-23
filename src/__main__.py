@@ -8,11 +8,6 @@ import os
 import time
 from apcaccess import status
 
-FILE_PATH   = os.path.abspath(__file__)
-DIR_FILE    = os.path.dirname(FILE_PATH)
-DIR_PROJECT = os.path.dirname(DIR_FILE)
-CONF_DIR    = os.path.join(DIR_PROJECT, "conf")
-
 def start_acpupsd(ups_name: str):
     """
     Start apcupsd daemon and bind a
@@ -42,7 +37,7 @@ def find_ups_nisport(ups_name: str):
     and return the configured NISPORT.
     """
 
-    conf_file = os.path.join(CONF_DIR, ups_name + ".conf")
+    conf_file = "/etc/apcupsd/" + ups_name + ".conf"
 
     with open(conf_file, "r", encoding="utf-8") as conf_opened:
         conf_lines = conf_opened.readlines()
