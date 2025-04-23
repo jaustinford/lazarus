@@ -59,8 +59,6 @@ def combine_metrics():
     combined_metrics = []
 
     for conf_file in find_conf_files():
-        logger.info("Polling metrics for conf file : %s", conf_file)
-
         ups_metrics = apc.get_metrics(
             find_ups_nisport(conf_file)
         )
@@ -85,12 +83,13 @@ def main():
     """
 
     for conf_file in find_conf_files():
+        logger.info("Starting APC daemon against conf file : %s", conf_file)
         apc.start_daemon(conf_file)
 
     while True:
         combined_metrics = combine_metrics()
 
-        logger.info("Showing combined metrics : %s", combined_metrics)
+        logger.info("Parsing available UPS' : %s", combined_metrics)
 
         time.sleep(10)
 
