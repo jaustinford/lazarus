@@ -89,7 +89,7 @@ def main():
     while True:
         combined_metrics = combine_metrics()
 
-        logger.info("Parsing available UPS' : %s", combined_metrics)
+        logger.info("Streaming metrics : %s", combined_metrics)
 
         time.sleep(10)
 
