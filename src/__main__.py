@@ -4,40 +4,13 @@ when to execute other docker container
 services on the system host.
 """
 
-import os
 import time
-from apcaccess import status
+import apc
 
 APC_UPS = [
     "ups-0",
     "ups-1"
 ]
-
-def start_acpupsd(ups_name: str):
-    """
-    Start apcupsd daemon and bind a
-    localhost TCP port.
-    """
-
-    os.system(
-        "/sbin/apcupsd \
-            -f /etc/apcupsd/" + ups_name + ".conf"
-    )
-
-def apc_get_metrics(daemon_port: int):
-    """
-    Poll the UPS for the latest metrics,
-    given the port of the daemon.
-    """
-
-    ups_metrics = status.parse(
-        status.get(
-            host="localhost",
-            port=daemon_port
-        )
-    )
-
-    return ups_metrics
 
 def find_ups_nisport(ups_name: str):
     """
@@ -67,20 +40,28 @@ def main():
     """
 
     for apc_ups in APC_UPS:
-        start_acpupsd(apc_ups)
+        apc.start_daemon(apc_ups)
 
     while True:
-        # ups0_metrics = apc_get_metrics(
-        #     find_ups_nisport("ups-0")
-        # )
+        combined_metrics = []
 
-        # ups1_metrics = apc_get_metrics(
-        #     find_ups_nisport("ups-1")
-        # )
+        for apc_ups in APC_UPS:
+            ups_metrics = apc.get_metrics(
+                find_ups_nisport(apc_ups)
+            )
 
-        # print(ups0_metrics)
-        # print(" ")
-        # print(ups1_metrics)
+            combined_metrics.append(
+                {
+                    apc_ups: {
+                        "status": ups_metrics["STATUS"],
+                        "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
+                        "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
+                        "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
+                    }
+                }
+            )
+
+        print(combined_metrics)
 
         time.sleep(10)
 
