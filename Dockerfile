@@ -24,6 +24,10 @@ RUN \
     apt install -y \
         apcupsd
 
+RUN \
+    pip install \
+        apcaccess
+
 WORKDIR /lazarus
 
 COPY --chmod=755 \
