@@ -49,6 +49,8 @@ def find_ups_nisport(conf_file: str):
 
 def combine_metrics():
     """
+    Create a list for each UPS with
+    parsed metric values.
     """
 
     combined_metrics = []
