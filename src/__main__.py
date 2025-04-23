@@ -47,6 +47,32 @@ def find_ups_nisport(conf_file: str):
 
     return int(port_value)
 
+def combine_metrics():
+    """
+    """
+
+    combined_metrics = []
+
+    for conf_file in find_conf_files():
+        print("test 1")
+        ups_metrics = apc.get_metrics(
+            find_ups_nisport(conf_file)
+        )
+
+        print("test 2")
+        combined_metrics.append(
+            {
+                ups_metrics["UPSNAME"]: {
+                    "status": ups_metrics["STATUS"],
+                    "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
+                    "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
+                    "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
+                }
+            }
+        )
+
+    return combined_metrics
+
 def main():
     """
     Execute conditionals and trigger
@@ -56,25 +82,12 @@ def main():
     for conf_file in find_conf_files():
         apc.start_daemon(conf_file)
 
+    print("test 3")
+
     while True:
-        combined_metrics = []
+        combined_metrics = combine_metrics()
 
-        for conf_file in find_conf_files():
-            ups_metrics = apc.get_metrics(
-                find_ups_nisport(conf_file)
-            )
-
-            combined_metrics.append(
-                {
-                    ups_metrics["UPSNAME"]: {
-                        "status": ups_metrics["STATUS"],
-                        "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
-                        "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
-                        "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
-                    }
-                }
-            )
-
+        print("test 4")
         print("test - " + str(combined_metrics))
 
         time.sleep(10)
