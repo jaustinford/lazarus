@@ -4,21 +4,35 @@ when to execute other docker container
 services on the system host.
 """
 
+import os
 import time
 import apc
 
-APC_UPS = [
-    "ups-0",
-    "ups-1"
-]
+FILE_PATH   = os.path.abspath(__file__)
+SRC_DIR     = os.path.dirname(FILE_PATH)
+PROJECT_DIR = os.path.dirname(SRC_DIR)
+CONF_DIR    = os.path.join(PROJECT_DIR, "conf")
 
-def find_ups_nisport(ups_name: str):
+def find_conf_files():
+    """
+    Return a list of the conf files
+    presented in /lazarus/conf.
+    """
+
+    conf_files = []
+
+    for conf_file in os.listdir(CONF_DIR):
+        conf_files.append(
+            os.path.join(CONF_DIR, conf_file)
+        )
+
+    return conf_files
+
+def find_ups_nisport(conf_file: str):
     """
     Read the conf file for a given UPS
     and return the configured NISPORT.
     """
-
-    conf_file = "/etc/apcupsd/" + ups_name + ".conf"
 
     with open(conf_file, "r", encoding="utf-8") as conf_opened:
         conf_lines = conf_opened.readlines()
@@ -39,20 +53,20 @@ def main():
     automations.
     """
 
-    for ups_name in APC_UPS:
-        apc.start_daemon(ups_name)
+    for conf_file in find_conf_files():
+        apc.start_daemon(conf_file)
 
     while True:
         combined_metrics = []
 
-        for apc_ups in APC_UPS:
+        for conf_file in find_conf_files():
             ups_metrics = apc.get_metrics(
-                find_ups_nisport(apc_ups)
+                find_ups_nisport(conf_file)
             )
 
             combined_metrics.append(
                 {
-                    apc_ups: {
+                    ups_metrics["UPSNAME"]: {
                         "status": ups_metrics["STATUS"],
                         "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
                         "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
@@ -61,7 +75,7 @@ def main():
                 }
             )
 
-        print(combined_metrics)
+        print("test - " + combined_metrics)
 
         time.sleep(10)
 

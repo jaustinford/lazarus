@@ -7,7 +7,7 @@ import os
 import time
 from apcaccess import status
 
-def start_daemon(ups_name: str):
+def start_daemon(conf_file: str):
     """
     Start apcupsd daemon and bind a
     localhost TCP port.
@@ -15,10 +15,10 @@ def start_daemon(ups_name: str):
 
     os.system(
         "/sbin/apcupsd \
-            -f /etc/apcupsd/" + ups_name + ".conf"
+            -f " + conf_file
     )
 
-    time.sleep(300)
+    time.sleep(10)
 
 def get_metrics(daemon_port: int):
     """
