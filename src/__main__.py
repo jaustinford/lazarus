@@ -39,8 +39,8 @@ def main():
     automations.
     """
 
-    for apc_ups in APC_UPS:
-        apc.start_daemon(apc_ups)
+    for ups_name in APC_UPS:
+        apc.start_daemon(ups_name)
 
     while True:
         combined_metrics = []

@@ -18,7 +18,7 @@ def start_daemon(ups_name: str):
             -f /etc/apcupsd/" + ups_name + ".conf"
     )
 
-    time.sleep(2)
+    time.sleep(300)
 
 def get_metrics(daemon_port: int):
     """
