@@ -41,14 +41,22 @@ def read_json(cycles_file: str):
 
     return cycles_json
 
-def process_mode(cycle_mode: str, mode_time: str, cycle_object: object, history_file: str):
+def process_mode(history_file: str, cycle_mode: str, cycle_object: object):
     """
     Conditionally execute targetted
     mode and evaluate the real_time
     timestamp.
     """
 
-    cycle_id = cycle_object["id"]
+    cycle_id   = cycle_object["id"]
+    cycle_down = cycle_object["down"]
+    cycle_up   = cycle_object["up"]
+
+    if cycle_mode == "down":
+        mode_time = cycle_down
+
+    elif cycle_mode == "up":
+        mode_time = cycle_up
 
     should_run = False
 
@@ -58,31 +66,27 @@ def process_mode(cycle_mode: str, mode_time: str, cycle_object: object, history_
         should_run = True
 
         logger.info(
-            "Preparing non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
+            "Executing non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     elif mode_time == real_time:
         should_run = True
 
         logger.info(
-            "Preparing scheduled cycle %s", cycle_mode + " job : " + cycle_id
+            "Executing scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     if should_run:
-        logger.info(
-            "Executing cycle %s", cycle_mode + " job : " + cycle_id
-        )
-
         history.update_json(
             history_file,
-            cycle_object,
-            cycle_mode
+            cycle_mode,
+            cycle_object
         )
 
         os.environ["CYCLE_MODE"] = cycle_mode
-        os.system("python /iac-configure/triggers/profile.py &> /dev/null")
+        os.system("python /iac-configure/triggers/profile.py > /dev/null")
 
-def determine_mode(cycle_mode: str, cycle_object: object, history_file: str):
+def determine_mode(history_file: str, cycle_mode: str, cycle_object: object):
     """
     Sort through based on mode
     and process conditionals if
@@ -91,22 +95,13 @@ def determine_mode(cycle_mode: str, cycle_object: object, history_file: str):
     """
 
     cycle_active = cycle_object["active"]
-    cycle_down   = cycle_object["down"]
-    cycle_up     = cycle_object["up"]
-
-    if cycle_mode == "up":
-        mode_time = cycle_up
-
-    elif cycle_mode == "down":
-        mode_time = cycle_down
 
     if cycle_active:
-        if not history.item_exists(history_file, cycle_object, cycle_mode):
+        if not history.item_exists(history_file, cycle_mode, cycle_object):
             process_mode(
+                history_file,
                 cycle_mode,
-                mode_time,
-                cycle_object,
-                history_file
+                cycle_object
             )
 
 def process_items(cycles_file: str, history_file: str):
@@ -120,13 +115,13 @@ def process_items(cycles_file: str, history_file: str):
 
     for cycle_object in read_json(cycles_file):
         determine_mode(
+            history_file,
             "down",
-            cycle_object,
-            history_file
+            cycle_object
         )
 
         determine_mode(
+            history_file,
             "up",
-            cycle_object,
-            history_file
+            cycle_object
         )

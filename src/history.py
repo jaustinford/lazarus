@@ -40,7 +40,7 @@ def read_json(history_file: str):
 
     return history_json
 
-def update_json(history_file: str, cycle_object: object, cycle_mode: str):
+def update_json(history_file: str, cycle_mode: str, cycle_object: object):
     """
     Open .history.json file, append new
     item and write out to file.
@@ -68,12 +68,14 @@ def update_json(history_file: str, cycle_object: object, cycle_mode: str):
             )
         )
 
-def item_exists(history_file: str, cycle_id: str, cycle_mode: str):
+def item_exists(history_file: str, cycle_mode: str, cycle_object: object):
     """
     Return boolean value for the
     existance of .history.json file
     item.
     """
+
+    cycle_id = cycle_object["id"]
 
     history_json = read_json(history_file)
 
