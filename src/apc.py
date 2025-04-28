@@ -34,3 +34,63 @@ def get_metrics(daemon_port: int):
     )
 
     return ups_metrics
+
+def find_conf_files(conf_dir: str):
+    """
+    Return a list of the conf files
+    presented in /lazarus/conf.
+    """
+
+    conf_files = []
+
+    for conf_file in os.listdir(conf_dir):
+        conf_files.append(
+            os.path.join(conf_dir, conf_file)
+        )
+
+    return conf_files
+
+def find_ups_nisport(conf_file: str):
+    """
+    Read the conf file for a given UPS
+    and return the configured NISPORT.
+    """
+
+    with open(conf_file, "r", encoding="utf-8") as conf_opened:
+        conf_lines = conf_opened.readlines()
+
+    for conf_line in conf_lines:
+        if conf_line.startswith("NISPORT"):
+            port_value = conf_line.split(" ")[1]
+            break
+
+    if not port_value:
+        port_value = None
+
+    return int(port_value)
+
+def combine_metrics():
+    """
+    Create a list for each UPS with
+    parsed metric values.
+    """
+
+    combined_metrics = []
+
+    for conf_file in find_conf_files():
+        ups_metrics = get_metrics(
+            find_ups_nisport(conf_file)
+        )
+
+        combined_metrics.append(
+            {
+                ups_metrics["UPSNAME"]: {
+                    "status": ups_metrics["STATUS"],
+                    "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
+                    "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
+                    "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
+                }
+            }
+        )
+
+    return combined_metrics
