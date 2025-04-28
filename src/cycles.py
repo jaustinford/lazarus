@@ -58,19 +58,19 @@ def process_mode(cycle_mode: str, mode_time: str, cycle_object: object, history_
         should_run = True
 
         logger.info(
-            "Preparing non-scheduled cycle " + cycle_mode + " job : %s", cycle_id
+            "Preparing non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     elif mode_time == real_time:
         should_run = True
 
         logger.info(
-            "Preparing scheduled cycle " + cycle_mode + " job : %s", cycle_id
+            "Preparing scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     if should_run:
         logger.info(
-            "Executing cycle " + cycle_mode + " job : %s", cycle_id
+            "Executing cycle %s", cycle_mode + " job : " + cycle_id
         )
 
         history.update_json(
@@ -79,7 +79,7 @@ def process_mode(cycle_mode: str, mode_time: str, cycle_object: object, history_
             cycle_mode
         )
 
-        os.environ["CYCLE_MODE"] == cycle_mode
+        os.environ["CYCLE_MODE"] = cycle_mode
         os.system("python /iac-configure/triggers/profile.py &> /dev/null")
 
 def determine_mode(cycle_mode: str, cycle_object: object, history_file: str):

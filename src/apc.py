@@ -69,7 +69,7 @@ def find_ups_nisport(conf_file: str):
 
     return int(port_value)
 
-def combine_metrics():
+def combine_metrics(conf_dir: str):
     """
     Create a list for each UPS with
     parsed metric values.
@@ -77,7 +77,7 @@ def combine_metrics():
 
     combined_metrics = []
 
-    for conf_file in find_conf_files():
+    for conf_file in find_conf_files(conf_dir):
         ups_metrics = get_metrics(
             find_ups_nisport(conf_file)
         )

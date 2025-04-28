@@ -31,7 +31,7 @@ def main():
     #     apc.start_daemon(conf_file)
 
     while True:
-        # combined_metrics = apc.combine_metrics()
+        # combined_metrics = apc.combine_metrics(CONF_DIR)
 
         cycles.process_items(CYCLES_FILE, HISTORY_FILE)
 
