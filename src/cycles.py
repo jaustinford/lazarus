@@ -115,6 +115,7 @@ def process_items(cycles_file: str, history_file: str):
     process down and up cycle jobs.
     """
 
+    create_json(cycles_file)
     history.create_json(history_file)
 
     for cycle_object in read_json(cycles_file):
