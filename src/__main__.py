@@ -7,8 +7,8 @@ services on the system host.
 import os
 import time
 import logs
-# import apc
 import cycles
+# import apc
 
 logger = logs.logging.getLogger(__name__)
 
@@ -17,8 +17,9 @@ SRC_DIR      = os.path.dirname(FILE_PATH)
 PROJECT_DIR  = os.path.dirname(SRC_DIR)
 
 CONF_DIR     = os.path.join(PROJECT_DIR, "conf")
-CYCLES_FILE  = os.path.join(PROJECT_DIR, "cycles.json")
-HISTORY_FILE = os.path.join(PROJECT_DIR, ".history.json")
+DATA_DIR     = os.path.join(PROJECT_DIR, "data")
+CYCLES_FILE  = os.path.join(PROJECT_DIR, DATA_DIR, "cycles.json")
+HISTORY_FILE = os.path.join(PROJECT_DIR, DATA_DIR, ".history.json")
 
 def main():
     """
