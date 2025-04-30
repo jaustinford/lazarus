@@ -12,9 +12,9 @@ import apc
 
 logger = logs.logging.getLogger(__name__)
 
-FILE_PATH    = os.path.abspath(__file__)
-SRC_DIR      = os.path.dirname(FILE_PATH)
-PROJECT_DIR  = os.path.dirname(SRC_DIR)
+FILE_PATH   = os.path.abspath(__file__)
+SRC_DIR     = os.path.dirname(FILE_PATH)
+PROJECT_DIR = os.path.dirname(SRC_DIR)
 
 CONF_DIR     = os.path.join(PROJECT_DIR, "conf")
 DATA_DIR     = os.path.join(PROJECT_DIR, "data")

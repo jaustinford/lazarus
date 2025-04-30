@@ -66,9 +66,8 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
 
 def process_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_object: object):
     """
-    Conditionally execute targetted
-    mode and evaluate the real_time
-    timestamp.
+    Execute tasks if a cycle has
+    been determined to run.
     """
 
     should_run = evaluate_object(
