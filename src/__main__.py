@@ -8,7 +8,7 @@ import os
 import time
 import logs
 import cycles
-# import apc
+import apc
 
 logger = logs.logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ PROJECT_DIR  = os.path.dirname(SRC_DIR)
 
 CONF_DIR     = os.path.join(PROJECT_DIR, "conf")
 DATA_DIR     = os.path.join(PROJECT_DIR, "data")
-CYCLES_FILE  = os.path.join(PROJECT_DIR, DATA_DIR, "cycles.json")
-HISTORY_FILE = os.path.join(PROJECT_DIR, DATA_DIR, ".history.json")
+CYCLES_PATH  = os.path.join(PROJECT_DIR, DATA_DIR, "cycles.json")
+HISTORY_PATH = os.path.join(PROJECT_DIR, DATA_DIR, ".history.json")
 
 def main():
     """
@@ -27,14 +27,17 @@ def main():
     automations.
     """
 
-    # for conf_file in find_conf_files(CONF_DIR):
-    #     logger.info("Starting APC daemon against conf file : %s", conf_file)
-    #     apc.start_daemon(conf_file)
+    for conf_file in apc.find_conf_files(CONF_DIR):
+        logger.info("Starting APC daemon against conf file : %s", conf_file)
+        apc.start_daemon(conf_file)
 
     while True:
         # combined_metrics = apc.combine_metrics(CONF_DIR)
 
-        cycles.process_items(CYCLES_FILE, HISTORY_FILE)
+        cycles.process_items(
+            CYCLES_PATH,
+            HISTORY_PATH
+        )
 
         time.sleep(1)
 

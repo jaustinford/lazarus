@@ -1,46 +1,15 @@
 """
 Manage executed cycle tasks in
-a separate .history.json.
+a persisted .history.json data file.
 """
 
-import os
-import json
 import datetime
+import datafile
 import logs
 
 logger = logs.logging.getLogger(__name__)
 
-def create_json(history_file: str):
-    """
-    Create the .history.json file
-    if missing.
-    """
-
-    if not os.path.isfile(history_file):
-        logger.info("Creating history file : %s", history_file)
-        with open(history_file, "w", encoding="utf-8") as history_opened:
-            history_opened.write(
-                json.dumps(
-                    {
-                        "history": []
-                    },
-                    indent=2
-                )
-            )
-
-def read_json(history_file: str):
-    """
-    Open history.json file and assign as
-    a JSON object.
-    """
-
-    with open(history_file, "r", encoding="utf-8") as history_opened:
-        history_read = history_opened.read()
-        history_json = json.loads(history_read)["history"]
-
-    return history_json
-
-def update_json(history_file: str, cycle_mode: str, cycle_object: object):
+def add_json(history_path: str, cycle_mode: str, cycle_object: object):
     """
     Open .history.json file, append new
     item and write out to file.
@@ -48,7 +17,7 @@ def update_json(history_file: str, cycle_mode: str, cycle_object: object):
 
     cycle_id = cycle_object["id"]
 
-    history_json = read_json(history_file)
+    history_json = datafile.read_json(history_path)
 
     history_json.append(
         {
@@ -58,17 +27,12 @@ def update_json(history_file: str, cycle_mode: str, cycle_object: object):
         }
     )
 
-    with open(history_file, "w", encoding="utf-8") as history_opened:
-        history_opened.write(
-            json.dumps(
-                {
-                    "history": history_json
-                },
-                indent=2
-            )
-        )
+    datafile.write_json(
+        history_path,
+        history_json
+    )
 
-def item_exists(history_file: str, cycle_mode: str, cycle_object: object):
+def item_exists(history_path: str, cycle_mode: str, cycle_object: object):
     """
     Return boolean value for the
     existance of .history.json file
@@ -77,7 +41,7 @@ def item_exists(history_file: str, cycle_mode: str, cycle_object: object):
 
     cycle_id = cycle_object["id"]
 
-    history_json = read_json(history_file)
+    history_json = datafile.read_json(history_path)
 
     item_found = False
 
