@@ -5,6 +5,7 @@ library and manage daemon.
 
 import os
 import time
+import datetime
 from apcaccess import status
 
 def start_daemon(conf_file: str):
@@ -88,7 +89,8 @@ def combine_metrics(conf_dir: str):
                 "status": ups_metrics["STATUS"],
                 "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
                 "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
-                "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
+                "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         )
 

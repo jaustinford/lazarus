@@ -28,6 +28,8 @@ def main():
     automations.
     """
 
+    increment_counter = 0
+
     if not elastic.index_exists("apcups"):
         elastic.create_index("apcups")
 
@@ -36,14 +38,18 @@ def main():
         apc.start_daemon(conf_file)
 
     while True:
+        increment_counter += 1
+
         combined_metrics = apc.combine_metrics(CONF_DIR)
 
-        if elastic.host_exists():
+        if elastic.host_exists() and increment_counter == 5:
             for combined_metric in combined_metrics:
                 elastic.add_doc(
                     "apcups",
                     combined_metric
                 )
+
+            increment_counter = 0
 
         cycles.process_items(
             CYCLES_PATH,

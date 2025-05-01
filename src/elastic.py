@@ -58,6 +58,10 @@ def create_index(index_name: str):
                 },
                 "loadpct": {
                     "type": "integer"
+                },
+                "timestamp": {
+                    "type": "date",
+                    "format": "date_time"
                 }
             }
         }
