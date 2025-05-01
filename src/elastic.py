@@ -4,39 +4,41 @@ into Elasticsearch.
 """
 
 import os
+import logging
 from elasticsearch import Elasticsearch
 
-ES_CLIENT = Elasticsearch(
-    "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
-    basic_auth=(
-        os.environ.get("ELASTICSEARCH_USERNAME"),
-        os.environ.get("ELASTICSEARCH_PASSWORD")
-    )
-)
+ES_LOGGER = logging.getLogger("elastic_transport.transport")
+ES_LOGGER.setLevel(logging.ERROR)
 
-def host_exists():
+def connect_elasticsearch():
     """
-    Return true if Elasticsearch
-    endpoint is accessible.
+    Attempt a connection to an elasticsearch
+    endpoint, pass if can't connect.
     """
 
-    return bool(ES_CLIENT.ping())
+    try:
+        es_client = Elasticsearch(
+            "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
+            basic_auth=(
+                os.environ.get("ELASTICSEARCH_USERNAME"),
+                os.environ.get("ELASTICSEARCH_PASSWORD")
+            ),
+            request_timeout=1
+        )
 
-def index_exists(index_name: str):
-    """
-    Return true if the target index
-    exists.
-    """
+    except Exception:
+        es_client = None
+        pass
 
-    return ES_CLIENT.indices.exists(index=index_name)
+    return es_client
 
-def create_index(index_name: str):
+def create_index(es_client: Elasticsearch, index_name: str):
     """
     Create Elasticsearch index if
     missing.
     """
 
-    ES_CLIENT.indices.create(
+    es_client.indices.create(
         index=index_name,
         settings={
             "number_of_shards": 1,
@@ -65,15 +67,4 @@ def create_index(index_name: str):
                 }
             }
         }
-    )
-
-def add_doc(index_name: str, doc_object: object):
-    """
-    Add metric data as a doc within
-    an Elasticsearch index.
-    """
-
-    ES_CLIENT.index(
-        index=index_name,
-        document=doc_object
     )

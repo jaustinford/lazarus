@@ -28,10 +28,13 @@ def main():
     automations.
     """
 
+    es_client = elastic.connect_elasticsearch()
+
     increment_counter = 0
 
-    if not elastic.index_exists("apcups"):
-        elastic.create_index("apcups")
+    if es_client.ping():
+        if not es_client.indices.exists(index="apcups"):
+            elastic.create_index(es_client, "apcups")
 
     for conf_file in apc.find_conf_files(CONF_DIR):
         LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
@@ -40,13 +43,11 @@ def main():
     while True:
         increment_counter += 1
 
-        combined_metrics = apc.combine_metrics(CONF_DIR)
-
-        if elastic.host_exists() and increment_counter == 30:
-            for combined_metric in combined_metrics:
-                elastic.add_doc(
-                    "apcups",
-                    combined_metric
+        if es_client.ping() and increment_counter == 30:
+            for combined_metric in apc.combine_metrics(CONF_DIR):
+                es_client.index(
+                    index="apcups",
+                    document=combined_metric
                 )
 
             increment_counter = 0
