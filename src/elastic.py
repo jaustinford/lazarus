@@ -20,13 +20,7 @@ def host_exists():
     endpoint is accessible.
     """
 
-    if ES_CLIENT.ping():
-        host_is_reachable = True
-
-    else:
-        host_is_reachable = False
-
-    return host_is_reachable
+    return bool(ES_CLIENT.ping())
 
 def index_exists(index_name: str):
     """
