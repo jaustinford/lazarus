@@ -109,7 +109,10 @@ def process_mode(cycle_mode: str, cycle_object: object):
         if cycle_mode == "up":
             removed_list = remove_json(cycle_object)
 
-            datafile.write_json(removed_list)
+            datafile.write_json(
+                constants.CYCLES_PATH,
+                removed_list
+            )
 
             manage_lock(
                 "remove",

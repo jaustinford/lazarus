@@ -43,11 +43,7 @@ def main():
 
                 increment_counter = 0
 
-        cycles.process_items(
-            constants.CYCLES_LOCK_PATH,
-            constants.CYCLES_PATH,
-            constants.HISTORY_PATH
-        )
+        cycles.process_items()
 
         time.sleep(1)
 
