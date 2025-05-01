@@ -9,8 +9,9 @@ import time
 import logs
 import cycles
 import apc
+import elastic
 
-logger = logs.logging.getLogger(__name__)
+LOGGER = logs.logging.getLogger(__name__)
 
 FILE_PATH   = os.path.abspath(__file__)
 SRC_DIR     = os.path.dirname(FILE_PATH)
@@ -27,12 +28,22 @@ def main():
     automations.
     """
 
+    if not elastic.index_exists("apcups"):
+        elastic.create_index("apcups")
+
     for conf_file in apc.find_conf_files(CONF_DIR):
-        logger.info("Starting APC daemon against conf file : %s", conf_file)
+        LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
         apc.start_daemon(conf_file)
 
     while True:
-        # combined_metrics = apc.combine_metrics(CONF_DIR)
+        combined_metrics = apc.combine_metrics(CONF_DIR)
+
+        if elastic.host_exists():
+            for combined_metric in combined_metrics:
+                elastic.add_doc(
+                    "apcups",
+                    combined_metric
+                )
 
         cycles.process_items(
             CYCLES_PATH,

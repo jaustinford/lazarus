@@ -5,9 +5,6 @@ a persisted .history.json data file.
 
 import datetime
 import datafile
-import logs
-
-logger = logs.logging.getLogger(__name__)
 
 def add_json(history_path: str, cycle_mode: str, cycle_object: object):
     """

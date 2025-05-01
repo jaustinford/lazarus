@@ -84,12 +84,11 @@ def combine_metrics(conf_dir: str):
 
         combined_metrics.append(
             {
-                ups_metrics["UPSNAME"]: {
-                    "status": ups_metrics["STATUS"],
-                    "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
-                    "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
-                    "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
-                }
+                "upsname": ups_metrics["UPSNAME"],
+                "status": ups_metrics["STATUS"],
+                "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
+                "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
+                "loadpct": ups_metrics["LOADPCT"].split(" ")[0]
             }
         )
 

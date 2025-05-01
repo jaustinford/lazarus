@@ -10,7 +10,7 @@ import datafile
 import logs
 import history
 
-logger = logs.logging.getLogger(__name__)
+LOGGER = logs.logging.getLogger(__name__)
 
 def remove_json(cycles_path: str, cycle_object: object):
     """
@@ -51,14 +51,14 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
     if mode_time == "now":
         should_run = True
 
-        logger.info(
+        LOGGER.info(
             "Executing non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     elif mode_time == real_time:
         should_run = True
 
-        logger.info(
+        LOGGER.info(
             "Executing scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
@@ -83,7 +83,7 @@ def process_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_obj
         )
 
         os.environ["CYCLE_MODE"] = cycle_mode
-        os.system("python /iac-configure/triggers/profile.py 2&> /dev/null")
+        os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
             removed_list = remove_json(

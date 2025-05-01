@@ -7,7 +7,7 @@ import os
 import json
 import logs
 
-logger = logs.logging.getLogger(__name__)
+LOGGER = logs.logging.getLogger(__name__)
 
 def create_json(file_path: str):
     """
@@ -18,7 +18,7 @@ def create_json(file_path: str):
     file_name = os.path.basename(file_path).split('.')[-2]
 
     if not os.path.isfile(file_path):
-        logger.info("Creating %s", file_name + " file : " + file_path)
+        LOGGER.info("Creating %s", file_name + " file : " + file_path)
         with open(file_path, "w", encoding="utf-8") as file_opened:
             file_opened.write(
                 json.dumps(
@@ -51,7 +51,7 @@ def write_json(file_path: str, file_list: list):
 
     file_name = os.path.basename(file_path).split('.')[-2]
 
-    logger.info("Writing %s", file_name + " file : " + file_path)
+    LOGGER.info("Writing %s", file_name + " file : " + file_path)
     with open(file_path, "w", encoding="utf-8") as file_opened:
         file_opened.write(
             json.dumps(
