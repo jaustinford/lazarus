@@ -42,7 +42,7 @@ def main():
 
         combined_metrics = apc.combine_metrics(CONF_DIR)
 
-        if elastic.host_exists() and increment_counter == 5:
+        if elastic.host_exists() and increment_counter == 60:
             for combined_metric in combined_metrics:
                 elastic.add_doc(
                     "apcups",

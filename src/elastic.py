@@ -61,7 +61,7 @@ def create_index(index_name: str):
                 },
                 "timestamp": {
                     "type": "date",
-                    "format": "date_time"
+                    "format": "date_time_no_millis"
                 }
             }
         }
