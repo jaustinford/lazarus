@@ -51,13 +51,13 @@ def create_index(index_name: str):
                     "type": "keyword"
                 },
                 "timeleft": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "bcharge": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "loadpct": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "timestamp": {
                     "type": "date",
