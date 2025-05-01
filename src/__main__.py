@@ -6,21 +6,12 @@ services on the system host.
 
 import os
 import time
+
+import constants
 import logs
 import cycles
 import apc
 import elastic
-
-LOGGER = logs.logging.getLogger(__name__)
-
-FILE_PATH   = os.path.abspath(__file__)
-SRC_DIR     = os.path.dirname(FILE_PATH)
-PROJECT_DIR = os.path.dirname(SRC_DIR)
-
-CONF_DIR     = os.path.join(PROJECT_DIR, "conf")
-DATA_DIR     = os.path.join(PROJECT_DIR, "data")
-CYCLES_PATH  = os.path.join(PROJECT_DIR, DATA_DIR, "cycles.json")
-HISTORY_PATH = os.path.join(PROJECT_DIR, DATA_DIR, ".history.json")
 
 def main():
     """
@@ -30,21 +21,21 @@ def main():
 
     increment_counter = 0
 
-    for conf_file in apc.find_conf_files(CONF_DIR):
-        LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
+    for conf_file in apc.find_conf_files(constants.CONF_DIR):
+        logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
         apc.start_daemon(conf_file)
 
     while True:
         increment_counter += 1
 
-        es_client = elastic.connect_elasticsearch()
+        if not os.path.isfile(constants.CYCLES_LOCK_PATH):
+            es_client = elastic.connect_elasticsearch()
 
-        if es_client.ping():
             if not es_client.indices.exists(index="apcups"):
                 elastic.create_index(es_client, "apcups")
 
             if increment_counter == 30:
-                for combined_metric in apc.combine_metrics(CONF_DIR):
+                for combined_metric in apc.combine_metrics(constants.CONF_DIR):
                     es_client.index(
                         index="apcups",
                         document=combined_metric
@@ -53,8 +44,9 @@ def main():
                 increment_counter = 0
 
         cycles.process_items(
-            CYCLES_PATH,
-            HISTORY_PATH
+            constants.CYCLES_LOCK_PATH,
+            constants.CYCLES_PATH,
+            constants.HISTORY_PATH
         )
 
         time.sleep(1)

@@ -8,6 +8,8 @@ import time
 from datetime import datetime, timezone
 from apcaccess import status
 
+import constants
+
 def start_daemon(conf_file: str):
     """
     Start apcupsd daemon and bind a
@@ -46,7 +48,10 @@ def find_conf_files(conf_dir: str):
 
     for conf_file in os.listdir(conf_dir):
         conf_files.append(
-            os.path.join(conf_dir, conf_file)
+            os.path.join(
+                conf_dir,
+                conf_file
+            )
         )
 
     return conf_files
@@ -90,7 +95,7 @@ def combine_metrics(conf_dir: str):
                 "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
                 "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
                 "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
-                "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                "timestamp": datetime.now(timezone.utc).strftime(constants.TIMESTAMP_FORMAT)
             }
         )
 

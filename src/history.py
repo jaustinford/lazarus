@@ -4,9 +4,11 @@ a persisted .history.json data file.
 """
 
 import datetime
+
+import constants
 import datafile
 
-def add_json(history_path: str, cycle_mode: str, cycle_object: object):
+def add_json(cycle_mode: str, cycle_object: object):
     """
     Open .history.json file, append new
     item and write out to file.
@@ -14,22 +16,22 @@ def add_json(history_path: str, cycle_mode: str, cycle_object: object):
 
     cycle_id = cycle_object["id"]
 
-    history_json = datafile.read_json(history_path)
+    history_json = datafile.read_json(constants.HISTORY_PATH)
 
     history_json.append(
         {
             "cycle_id": cycle_id,
             "mode": cycle_mode,
-            "added": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+            "added": datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT)
         }
     )
 
     datafile.write_json(
-        history_path,
+        constants.HISTORY_PATH,
         history_json
     )
 
-def item_exists(history_path: str, cycle_mode: str, cycle_object: object):
+def item_exists(cycle_mode: str, cycle_object: object):
     """
     Return boolean value for the
     existance of .history.json file
@@ -38,7 +40,7 @@ def item_exists(history_path: str, cycle_mode: str, cycle_object: object):
 
     cycle_id = cycle_object["id"]
 
-    history_json = datafile.read_json(history_path)
+    history_json = datafile.read_json(constants.HISTORY_PATH)
 
     item_found = False
 

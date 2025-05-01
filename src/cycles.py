@@ -6,13 +6,29 @@ operations.
 
 import os
 import datetime
-import datafile
+
+import constants
 import logs
+import datafile
 import history
 
-LOGGER = logs.logging.getLogger(__name__)
+def manage_lock(lock_mode: str, cycle_object: object):
+    """
+    Use a lock file to skip certain
+    operations until lock file is
+    removed.
+    """
 
-def remove_json(cycles_path: str, cycle_object: object):
+    if lock_mode == "add":
+        logs.GENERAL_LOGGER.info("Creating cycles lock file : %s", constants.CYCLES_LOCK_PATH)
+        with open(constants.CYCLES_LOCK_PATH, "w", encoding="utf-8") as cycle_lock_opened:
+            cycle_lock_opened.write(cycle_object["id"])
+
+    elif lock_mode == "remove":
+        logs.GENERAL_LOGGER.info("Removing cycles lock file : %s", constants.CYCLES_LOCK_PATH)
+        os.remove(constants.CYCLES_LOCK_PATH)
+
+def remove_json(cycle_object: object):
     """
     Return a list of all cycles object, less
     the one provided in cycle_object.
@@ -22,7 +38,7 @@ def remove_json(cycles_path: str, cycle_object: object):
 
     cycle_id = cycle_object["id"]
 
-    for file_object in datafile.read_json(cycles_path):
+    for file_object in datafile.read_json(constants.CYCLES_PATH):
         if file_object["id"] != cycle_id:
             removed_list.append(file_object)
 
@@ -40,7 +56,7 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
 
     should_run = False
 
-    real_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    real_time = datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT)
 
     if cycle_mode == "down":
         mode_time = cycle_down
@@ -51,20 +67,20 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
     if mode_time == "now":
         should_run = True
 
-        LOGGER.info(
+        logs.GENERAL_LOGGER.info(
             "Executing non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     elif mode_time == real_time:
         should_run = True
 
-        LOGGER.info(
+        logs.GENERAL_LOGGER.info(
             "Executing scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     return should_run
 
-def process_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_object: object):
+def process_mode(cycle_mode: str, cycle_object: object):
     """
     Execute tasks if a cycle has
     been determined to run.
@@ -76,8 +92,13 @@ def process_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_obj
     )
 
     if should_run:
+        if cycle_mode == "down":
+            manage_lock(
+                "add",
+                cycle_object
+            )
+
         history.add_json(
-            history_path,
             cycle_mode,
             cycle_object
         )
@@ -86,17 +107,16 @@ def process_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_obj
         os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
-            removed_list = remove_json(
-                cycles_path,
+            removed_list = remove_json(cycle_object)
+
+            datafile.write_json(removed_list)
+
+            manage_lock(
+                "remove",
                 cycle_object
             )
 
-            datafile.write_json(
-                cycles_path,
-                removed_list
-            )
-
-def determine_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_object: object):
+def determine_mode(cycle_mode: str, cycle_object: object):
     """
     Sort through based on mode
     and process conditionals if
@@ -107,34 +127,28 @@ def determine_mode(cycles_path: str, history_path: str, cycle_mode: str, cycle_o
     cycle_active = cycle_object["active"]
 
     if cycle_active:
-        if not history.item_exists(history_path, cycle_mode, cycle_object):
+        if not history.item_exists(cycle_mode, cycle_object):
             process_mode(
-                cycles_path,
-                history_path,
                 cycle_mode,
                 cycle_object
             )
 
-def process_items(cycles_path: str, history_path: str):
+def process_items():
     """
     Iterate over cycles.json and
     process down and up cycle jobs.
     """
 
-    datafile.create_json(cycles_path)
-    datafile.create_json(history_path)
+    datafile.create_json(constants.CYCLES_PATH)
+    datafile.create_json(constants.HISTORY_PATH)
 
-    for cycle_object in datafile.read_json(cycles_path):
+    for cycle_object in datafile.read_json(constants.CYCLES_PATH):
         determine_mode(
-            cycles_path,
-            history_path,
             "down",
             cycle_object
         )
 
         determine_mode(
-            cycles_path,
-            history_path,
             "up",
             cycle_object
         )

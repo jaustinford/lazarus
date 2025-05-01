@@ -4,11 +4,7 @@ into Elasticsearch.
 """
 
 import os
-import logging
 from elasticsearch import Elasticsearch
-
-ES_LOGGER = logging.getLogger("elastic_transport")
-ES_LOGGER.setLevel(logging.CRITICAL)
 
 def connect_elasticsearch():
     """
