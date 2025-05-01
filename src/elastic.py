@@ -7,8 +7,8 @@ import os
 import logging
 from elasticsearch import Elasticsearch
 
-ES_LOGGER = logging.getLogger("elastic_transport.transport")
-ES_LOGGER.setLevel(logging.ERROR)
+ES_LOGGER = logging.getLogger("elastic_transport")
+ES_LOGGER.setLevel(logging.CRITICAL)
 
 def connect_elasticsearch():
     """
@@ -16,7 +16,6 @@ def connect_elasticsearch():
     endpoint, pass if can't connect.
     """
 
-    # try:
     es_client = Elasticsearch(
         "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
         basic_auth=(
@@ -25,10 +24,6 @@ def connect_elasticsearch():
         ),
         request_timeout=1
     )
-
-    # except Exception:
-    #     es_client = None
-    #     pass
 
     return es_client
 
