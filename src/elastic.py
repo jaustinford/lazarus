@@ -16,19 +16,19 @@ def connect_elasticsearch():
     endpoint, pass if can't connect.
     """
 
-    try:
-        es_client = Elasticsearch(
-            "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
-            basic_auth=(
-                os.environ.get("ELASTICSEARCH_USERNAME"),
-                os.environ.get("ELASTICSEARCH_PASSWORD")
-            ),
-            request_timeout=1
-        )
+    # try:
+    es_client = Elasticsearch(
+        "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
+        basic_auth=(
+            os.environ.get("ELASTICSEARCH_USERNAME"),
+            os.environ.get("ELASTICSEARCH_PASSWORD")
+        ),
+        request_timeout=1
+    )
 
-    except Exception:
-        es_client = None
-        pass
+    # except Exception:
+    #     es_client = None
+    #     pass
 
     return es_client
 
