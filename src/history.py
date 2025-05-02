@@ -22,7 +22,7 @@ def add_json(cycle_mode: str, cycle_object: object):
         {
             "cycle_id": cycle_id,
             "mode": cycle_mode,
-            "added": datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT)
+            "added": datetime.datetime.now().strftime(constants.TIME_FORMAT_TIMESTAMP)
         }
     )
 

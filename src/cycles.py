@@ -56,7 +56,7 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
 
     should_run = False
 
-    real_time = datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT)
+    real_time = datetime.datetime.now().strftime(constants.TIME_FORMAT_CYCLE)
 
     if cycle_mode == "down":
         mode_time = cycle_down

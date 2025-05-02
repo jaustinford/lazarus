@@ -4,7 +4,8 @@ Collection of shared constants.
 
 import os
 
-TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+TIME_FORMAT_TIMESTAMP = "%Y-%m-%dT%H:%M:%SZ"
+TIME_FORMAT_CYCLE     = "%Y-%m-%d %H:%M"
 
 FILE_PATH   = os.path.abspath(__file__)
 SRC_DIR     = os.path.dirname(FILE_PATH)
