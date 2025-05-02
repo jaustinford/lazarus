@@ -114,10 +114,10 @@ def process_mode(cycle_mode: str, cycle_object: object):
                 removed_list
             )
 
-            manage_lock(
-                "remove",
-                cycle_object
-            )
+            # manage_lock(
+            #     "remove",
+            #     cycle_object
+            # )
 
 def determine_mode(cycle_mode: str, cycle_object: object):
     """
