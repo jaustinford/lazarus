@@ -107,12 +107,10 @@ def process_mode(cycle_mode: str, cycle_object: object):
         os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
-            # removed_list = remove_json(cycle_object)
-
-            # datafile.write_json(
-            #     constants.CYCLES_PATH,
-            #     removed_list
-            # )
+            datafile.write_json(
+                constants.CYCLES_PATH,
+                remove_json(cycle_object)
+            )
 
             manage_lock(
                 "remove",

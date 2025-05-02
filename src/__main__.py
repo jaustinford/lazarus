@@ -28,12 +28,15 @@ def main():
     while True:
         if not os.path.isfile(constants.CYCLES_LOCK_PATH) and \
            increment_counter == 30:
+            logs.GENERAL_LOGGER.info("test")
             es_client = elastic.connect_elasticsearch()
+            logs.GENERAL_LOGGER.info(es_client.info(filter_path="cluster_name"))
 
             if not es_client.indices.exists(index="apcups"):
                 elastic.create_index(es_client, "apcups")
 
             for combined_metric in apc.combine_metrics(constants.CONF_DIR):
+                logs.GENERAL_LOGGER.info("combined test : %s", str(combined_metric))
                 es_client.index(
                     index="apcups",
                     document=combined_metric
