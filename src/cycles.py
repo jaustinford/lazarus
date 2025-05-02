@@ -51,6 +51,7 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
     """
 
     cycle_id   = cycle_object["id"]
+    cycle_type = cycle_object["type"]
     cycle_down = cycle_object["down"]
     cycle_up   = cycle_object["up"]
 
@@ -67,15 +68,12 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
     if mode_time == "now":
         should_run = True
 
-        logs.GENERAL_LOGGER.info(
-            "Selecting non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
-        )
-
     elif mode_time == real_time:
         should_run = True
 
+    if should_run:
         logs.GENERAL_LOGGER.info(
-            "Selecting scheduled cycle %s", cycle_mode + " job : " + cycle_id
+            "Selecting " + cycle_type + " type cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     return should_run
@@ -126,14 +124,11 @@ def determine_mode(cycle_mode: str, cycle_object: object):
     does not exist.
     """
 
-    cycle_active = cycle_object["active"]
-
-    if cycle_active:
-        if not history.item_exists(cycle_mode, cycle_object):
-            process_mode(
-                cycle_mode,
-                cycle_object
-            )
+    if not history.item_exists(cycle_mode, cycle_object):
+        process_mode(
+            cycle_mode,
+            cycle_object
+        )
 
 def process_items():
     """

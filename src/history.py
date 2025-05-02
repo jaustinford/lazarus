@@ -14,13 +14,15 @@ def add_json(cycle_mode: str, cycle_object: object):
     item and write out to file.
     """
 
-    cycle_id = cycle_object["id"]
+    cycle_id   = cycle_object["id"]
+    cycle_type = cycle_object["type"]
 
     history_json = datafile.read_json(constants.HISTORY_PATH)
 
     history_json.append(
         {
-            "cycle_id": cycle_id,
+            "id": cycle_id,
+            "type": cycle_type,
             "mode": cycle_mode,
             "added": datetime.datetime.now().strftime(constants.TIME_FORMAT_TIMESTAMP)
         }

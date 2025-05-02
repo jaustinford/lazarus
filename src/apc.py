@@ -9,6 +9,40 @@ from datetime import datetime, timezone
 from apcaccess import status
 
 import constants
+import logs
+import elastic
+
+def service_init():
+    """
+    Find available UPS configs and create
+    daemonized processes for each.
+    """
+
+    for conf_file in find_conf_files(constants.CONF_DIR):
+        logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
+        start_daemon(conf_file)
+
+def process_elastic():
+    """
+    Iterate over combined UPS metrics
+    and process into Elasticsearch.
+    """
+
+    es_client = elastic.connect_elasticsearch()
+
+    logs.GENERAL_LOGGER.info("Connected to Elasticsearch : %s", es_client.info())
+
+    if not es_client.indices.exists(index="apcups"):
+        elastic.create_index(es_client, "apcups")
+
+    for combined_metric in combine_metrics(constants.CONF_DIR):
+        logs.GENERAL_LOGGER.info("UPS metrics ingested : %s", str(combined_metric))
+        es_client.index(
+            index="apcups",
+            document=combined_metric
+        )
+
+    es_client.close()
 
 def start_daemon(conf_file: str):
     """
