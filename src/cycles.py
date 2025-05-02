@@ -68,14 +68,14 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
         should_run = True
 
         logs.GENERAL_LOGGER.info(
-            "Executing non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
+            "Selecting non-scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     elif mode_time == real_time:
         should_run = True
 
         logs.GENERAL_LOGGER.info(
-            "Executing scheduled cycle %s", cycle_mode + " job : " + cycle_id
+            "Selecting scheduled cycle %s", cycle_mode + " job : " + cycle_id
         )
 
     return should_run
@@ -103,6 +103,7 @@ def process_mode(cycle_mode: str, cycle_object: object):
             cycle_object
         )
 
+        logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
         os.environ["CYCLE_MODE"] = cycle_mode
         os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
