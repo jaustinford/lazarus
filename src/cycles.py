@@ -73,7 +73,7 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
 
     if should_run:
         logs.GENERAL_LOGGER.info(
-            "Selecting " + cycle_type + " type cycle %s", cycle_mode + " job : " + cycle_id
+            "Selecting %s", cycle_type + " type " + cycle_mode + " job : " + cycle_id
         )
 
     return should_run
