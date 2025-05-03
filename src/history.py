@@ -47,7 +47,7 @@ def item_exists(cycle_mode: str, cycle_object: object):
     item_found = False
 
     for history_item in history_json:
-        if history_item["cycle_id"] == cycle_id:
+        if history_item["id"] == cycle_id:
             if history_item["mode"] == cycle_mode:
                 item_found = True
                 break
