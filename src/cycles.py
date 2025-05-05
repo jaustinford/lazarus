@@ -5,13 +5,27 @@ operations.
 """
 
 import os
-import re
-import datetime
+import random
+import string
+from datetime import datetime, timedelta
 
 import constants
 import logs
 import datafile
 import history
+
+def generate_random_id(string_length: int=20):
+    """
+    """
+
+    random_string = ""
+
+    for _ in range(string_length):
+        random_string += random.choice(
+            string.ascii_lowercase + string.ascii_uppercase
+        )
+
+    return random_string
 
 def manage_lock(lock_mode: str, cycle_object: object):
     """
@@ -32,46 +46,24 @@ def manage_lock(lock_mode: str, cycle_object: object):
 def increment_date(cycle_type: str, cycle_job: str):
     """
     Generate future dates for down and up
-    job cycles respective of the month.
+    job cycles using timedelta.
     """
 
-    cycle_job_month = cycle_job.split(" ")[0].split("-")[1]
-    cycle_job_day   = cycle_job.split(" ")[0].split("-")[2]
+    cycle_job_dt = datetime.strptime(cycle_job, constants.TIME_FORMAT)
 
     if cycle_type == "daily":
-        day_increment = 1
+        delta_time_dt = cycle_job_dt + timedelta(days=1)
 
     elif cycle_type == "weekly":
-        day_increment = 7
+        delta_time_dt = cycle_job_dt + timedelta(days=7)
 
-    new_cycle_down_day = int(cycle_job_day) + day_increment
+    elif cycle_type.startswith("custom"):
+        delta_time_days = int(cycle_type.split(":")[1])
+        delta_time_dt   = cycle_job_dt + timedelta(days=delta_time_days)
 
-    if new_cycle_down_day > constants.MONTHS[cycle_job_day]:
-        new_cycle_down_day   = new_cycle_down_day - constants.MONTHS[cycle_job_day]
-        new_cycle_down_month = int(cycle_job_month) + 1
+    delta_time_string = delta_time_dt.strftime(constants.TIME_FORMAT)
 
-        if new_cycle_down_month > 12:
-            new_cycle_down_month == 1
-
-    else:
-        new_cycle_down_month = cycle_job_month
-
-    if new_cycle_down_day < 10:
-        new_cycle_down_day = "0" + str(new_cycle_down_day)
-
-    substituted_month = re.sub(
-        "-" + cycle_job_month + "-",
-        "-" + str(new_cycle_down_month) + "-",
-        cycle_job
-    )
-
-    substituted_day = re.sub(
-        "-" + cycle_job_day + " ",
-        "-" + str(new_cycle_down_day) + " ",
-        substituted_month
-    )
-
-    return substituted_day
+    return delta_time_string
 
 def scheduled_job(cycle_object: object):
     """
@@ -84,7 +76,7 @@ def scheduled_job(cycle_object: object):
     cycle_up   = cycle_object["up"]
 
     new_scheduled_obect = {
-        "id": "generate_random_id()",
+        "id": generate_random_id(),
         "type": cycle_type,
         "down": increment_date(cycle_type, cycle_down),
         "up": increment_date(cycle_type, cycle_up)
@@ -107,12 +99,16 @@ def remove_object(cycle_object: object):
         if file_object["id"] != cycle_id:
             removed_list.append(file_object)
 
-    if cycle_type == "daily" or \
-       cycle_type == "weekly":
+    if cycle_type in "daily" "weekly":
         removed_list.append(
             scheduled_job(cycle_object)
         )
-
+    
+    elif cycle_type.startswith("custom"):
+        removed_list.append(
+            scheduled_job(cycle_object)
+        )
+    
     return removed_list
 
 def evaluate_object(cycle_mode: str, cycle_object: object):
@@ -128,18 +124,17 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
 
     should_run = False
 
-    real_time = datetime.datetime.now().strftime(constants.TIME_FORMAT_CYCLE)
-
     if cycle_mode == "down":
         mode_time = cycle_down
 
     elif cycle_mode == "up":
         mode_time = cycle_up
 
-    if mode_time == "now":
-        should_run = True
+    real_time_dt   = datetime.now().replace(microsecond=0)
+    target_time_dt = datetime.strptime(mode_time, constants.TIME_FORMAT)
+    delta_time_dt  = target_time_dt + timedelta(seconds=5)
 
-    elif mode_time == real_time:
+    if real_time_dt >= target_time_dt and real_time_dt < delta_time_dt:
         should_run = True
 
     if should_run:
@@ -172,9 +167,9 @@ def process_mode(cycle_mode: str, cycle_object: object):
             cycle_object
         )
 
-        logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
-        os.environ["CYCLE_MODE"] = cycle_mode
-        os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
+        # logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
+        # os.environ["CYCLE_MODE"] = cycle_mode
+        # os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
             datafile.write_json(

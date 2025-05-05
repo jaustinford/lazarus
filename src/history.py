@@ -3,7 +3,7 @@ Manage executed cycle tasks in
 a persisted .history.json data file.
 """
 
-import datetime
+from datetime import datetime
 
 import constants
 import datafile
@@ -24,7 +24,7 @@ def add_json(cycle_mode: str, cycle_object: object):
             "id": cycle_id,
             "type": cycle_type,
             "mode": cycle_mode,
-            "added": datetime.datetime.now().strftime(constants.TIME_FORMAT_TIMESTAMP)
+            "added": datetime.now().strftime(constants.TIME_FORMAT)
         }
     )
 
