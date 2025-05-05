@@ -172,9 +172,9 @@ def process_mode(cycle_mode: str, cycle_object: object):
             cycle_object
         )
 
-        # logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
-        # os.environ["CYCLE_MODE"] = cycle_mode
-        # os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
+        logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
+        os.environ["CYCLE_MODE"] = cycle_mode
+        os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
             datafile.write_json(

@@ -19,14 +19,14 @@ def main():
 
     increment_counter = 0
 
-    # apc.service_init()
+    apc.service_init()
 
     while True:
-        # if increment_counter == 20:
-        #     if not os.path.isfile(constants.CYCLES_LOCK_PATH):
-        #         apc.process_elastic()
+        if increment_counter == 20:
+            if not os.path.isfile(constants.CYCLES_LOCK_PATH):
+                apc.process_elastic()
 
-        #     increment_counter = 0
+            increment_counter = 0
 
         increment_counter += 1
 
