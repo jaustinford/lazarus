@@ -22,7 +22,25 @@ def service_init():
         logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
         start_daemon(conf_file)
 
-def process_elastic():
+def determine_power_event(combined_metrics: list):
+    """
+    Return true if metrics show a
+    status for any UPS other than
+    ONLINE.
+    """
+
+    status_event = False
+
+    for combined_metric in combined_metrics:
+        metric_status = combined_metric["status"]
+
+        if metric_status != "ONLINE":
+            status_event = True
+            break
+
+    return status_event
+
+def process_elastic(combined_metrics: list):
     """
     Iterate over combined UPS metrics
     and process into Elasticsearch.
@@ -35,7 +53,7 @@ def process_elastic():
     if not es_client.indices.exists(index="apcups"):
         elastic.create_index(es_client, "apcups")
 
-    for combined_metric in combine_metrics(constants.CONF_DIR):
+    for combined_metric in combined_metrics:
         logs.GENERAL_LOGGER.info("UPS metrics ingested : %s", str(combined_metric))
         es_client.index(
             index="apcups",

@@ -22,15 +22,17 @@ def main():
     apc.service_init()
 
     while True:
+        combined_metrics = apc.combine_metrics(constants.CONF_DIR)
+
         if increment_counter == 20:
             if not os.path.isfile(constants.CYCLES_LOCK_PATH):
-                apc.process_elastic()
+                apc.process_elastic(combined_metrics)
 
             increment_counter = 0
 
         increment_counter += 1
 
-        cycles.process_items()
+        cycles.process_items(combined_metrics)
         time.sleep(1)
 
 if __name__ == "__main__":

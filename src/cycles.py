@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import constants
 import logs
 import datafile
+import apc
 import history
 
 def generate_random_id(string_length: int=20):
@@ -85,6 +86,21 @@ def scheduled_job(cycle_object: object):
     }
 
     return new_scheduled_obect
+
+def add_object(cycle_object: object):
+    """
+    Return a list of all cycles object, plus
+    the one provided in cycle_object.
+    """
+
+    added_list = []
+
+    for file_object in datafile.read_json(constants.CYCLES_PATH):
+        added_list.append(file_object)
+
+    added_list.append(cycle_object)
+
+    return added_list
 
 def remove_object(cycle_object: object):
     """
@@ -199,7 +215,7 @@ def determine_mode(cycle_mode: str, cycle_object: object):
             cycle_object
         )
 
-def process_items():
+def process_items(combined_metrics: list):
     """
     Iterate over cycles.json and
     process down and up cycle jobs.
@@ -207,6 +223,9 @@ def process_items():
 
     datafile.create_json(constants.CYCLES_PATH)
     datafile.create_json(constants.HISTORY_PATH)
+
+    if apc.determine_power_event(combined_metrics):
+        logs.GENERAL_LOGGER.info("Power event has occurred.")
 
     for cycle_object in datafile.read_json(constants.CYCLES_PATH):
         determine_mode(
