@@ -16,6 +16,8 @@ import history
 
 def generate_random_id(string_length: int=20):
     """
+    Create a random string given
+    string_length.
     """
 
     random_string = ""
@@ -103,12 +105,12 @@ def remove_object(cycle_object: object):
         removed_list.append(
             scheduled_job(cycle_object)
         )
-    
+
     elif cycle_type.startswith("custom"):
         removed_list.append(
             scheduled_job(cycle_object)
         )
-    
+
     return removed_list
 
 def evaluate_object(cycle_mode: str, cycle_object: object):
@@ -134,8 +136,9 @@ def evaluate_object(cycle_mode: str, cycle_object: object):
     target_time_dt = datetime.strptime(mode_time, constants.TIME_FORMAT)
     delta_time_dt  = target_time_dt + timedelta(seconds=5)
 
-    if real_time_dt >= target_time_dt and real_time_dt < delta_time_dt:
-        should_run = True
+    if real_time_dt >= target_time_dt:
+        if real_time_dt < delta_time_dt:
+            should_run = True
 
     if should_run:
         logs.GENERAL_LOGGER.info(
@@ -167,9 +170,9 @@ def process_mode(cycle_mode: str, cycle_object: object):
             cycle_object
         )
 
-        # logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
-        # os.environ["CYCLE_MODE"] = cycle_mode
-        # os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
+        logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
+        os.environ["CYCLE_MODE"] = cycle_mode
+        os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
             datafile.write_json(
