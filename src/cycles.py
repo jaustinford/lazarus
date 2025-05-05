@@ -5,6 +5,7 @@ operations.
 """
 
 import os
+import re
 import datetime
 
 import constants
@@ -28,7 +29,70 @@ def manage_lock(lock_mode: str, cycle_object: object):
         logs.GENERAL_LOGGER.info("Removing cycles lock file : %s", constants.CYCLES_LOCK_PATH)
         os.remove(constants.CYCLES_LOCK_PATH)
 
-def remove_json(cycle_object: object):
+def increment_date(cycle_type: str, cycle_job: str):
+    """
+    Generate future dates for down and up
+    job cycles respective of the month.
+    """
+
+    cycle_job_month = cycle_job.split(" ")[0].split("-")[1]
+    cycle_job_day   = cycle_job.split(" ")[0].split("-")[2]
+
+    if cycle_type == "daily":
+        day_increment = 1
+
+    elif cycle_type == "weekly":
+        day_increment = 7
+
+    new_cycle_down_day = int(cycle_job_day) + day_increment
+
+    if new_cycle_down_day > constants.MONTHS[cycle_job_day]:
+        new_cycle_down_day   = new_cycle_down_day - constants.MONTHS[cycle_job_day]
+        new_cycle_down_month = int(cycle_job_month) + 1
+
+        if new_cycle_down_month > 12:
+            new_cycle_down_month == 1
+
+    else:
+        new_cycle_down_month = cycle_job_month
+
+    if new_cycle_down_day < 10:
+        new_cycle_down_day = "0" + str(new_cycle_down_day)
+
+    substituted_month = re.sub(
+        "-" + cycle_job_month + "-",
+        "-" + str(new_cycle_down_month) + "-",
+        cycle_job
+    )
+
+    substituted_day = re.sub(
+        "-" + cycle_job_day + " ",
+        "-" + str(new_cycle_down_day) + " ",
+        substituted_month
+    )
+
+    return substituted_day
+
+def scheduled_job(cycle_object: object):
+    """
+    Create scheduled job object with generated
+    timestamps reflecting incremented times.
+    """
+
+    cycle_type = cycle_object["type"]
+    cycle_down = cycle_object["down"]
+    cycle_up   = cycle_object["up"]
+
+    new_scheduled_obect = {
+        "id": "generate_random_id()",
+        "type": cycle_type,
+        "down": increment_date(cycle_type, cycle_down),
+        "up": increment_date(cycle_type, cycle_up)
+    }
+
+    return new_scheduled_obect
+
+def remove_object(cycle_object: object):
     """
     Return a list of all cycles object, less
     the one provided in cycle_object.
@@ -36,11 +100,18 @@ def remove_json(cycle_object: object):
 
     removed_list = []
 
-    cycle_id = cycle_object["id"]
+    cycle_id   = cycle_object["id"]
+    cycle_type = cycle_object["type"]
 
     for file_object in datafile.read_json(constants.CYCLES_PATH):
         if file_object["id"] != cycle_id:
             removed_list.append(file_object)
+
+    if cycle_type == "daily" or \
+       cycle_type == "weekly":
+        removed_list.append(
+            scheduled_job(cycle_object)
+        )
 
     return removed_list
 
@@ -101,14 +172,14 @@ def process_mode(cycle_mode: str, cycle_object: object):
             cycle_object
         )
 
-        logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
-        os.environ["CYCLE_MODE"] = cycle_mode
-        os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
+        # logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", cycle_mode + " mode...")
+        # os.environ["CYCLE_MODE"] = cycle_mode
+        # os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
 
         if cycle_mode == "up":
             datafile.write_json(
                 constants.CYCLES_PATH,
-                remove_json(cycle_object)
+                remove_object(cycle_object)
             )
 
             manage_lock(

@@ -16,3 +16,9 @@ DATA_DIR         = os.path.join(PROJECT_DIR, "data")
 CYCLES_PATH      = os.path.join(PROJECT_DIR, DATA_DIR, "cycles.json")
 CYCLES_LOCK_PATH = os.path.join(PROJECT_DIR, DATA_DIR, "cycles.lock")
 HISTORY_PATH     = os.path.join(PROJECT_DIR, DATA_DIR, ".history.json")
+
+MONTHS = {
+    "01": 31, "02": 28, "03": 31, "04": 30,
+    "05": 31, "06": 30, "07": 31, "08": 31, 
+    "09": 30, "10": 31, "11": 30, "12": 31
+}
