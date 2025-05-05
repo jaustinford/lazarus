@@ -5,8 +5,6 @@ operations.
 """
 
 import os
-import random
-import string
 from datetime import datetime, timedelta
 
 import constants
@@ -14,21 +12,6 @@ import logs
 import datafile
 import apc
 import history
-
-def generate_random_id(string_length: int=20):
-    """
-    Create a random string given
-    string_length.
-    """
-
-    random_string = ""
-
-    for _ in range(string_length):
-        random_string += random.choice(
-            string.ascii_lowercase + string.ascii_uppercase
-        )
-
-    return random_string
 
 def manage_lock(lock_mode: str, cycle_object: object):
     """
@@ -68,7 +51,7 @@ def increment_date(cycle_type: str, cycle_job: str):
 
     return delta_time_string
 
-def scheduled_job(cycle_object: object):
+def schedule_job(cycle_object: object):
     """
     Create scheduled job object with generated
     timestamps reflecting incremented times.
@@ -78,14 +61,12 @@ def scheduled_job(cycle_object: object):
     cycle_down = cycle_object["down"]
     cycle_up   = cycle_object["up"]
 
-    new_scheduled_obect = {
-        "id": generate_random_id(),
+    return {
+        "id": datafile.generate_id(),
         "type": cycle_type,
         "down": increment_date(cycle_type, cycle_down),
         "up": increment_date(cycle_type, cycle_up)
     }
-
-    return new_scheduled_obect
 
 def add_object(cycle_object: object):
     """
@@ -108,26 +89,26 @@ def remove_object(cycle_object: object):
     the one provided in cycle_object.
     """
 
-    removed_list = []
+    shrunken_list = []
 
     cycle_id   = cycle_object["id"]
     cycle_type = cycle_object["type"]
 
     for file_object in datafile.read_json(constants.CYCLES_PATH):
         if file_object["id"] != cycle_id:
-            removed_list.append(file_object)
+            shrunken_list.append(file_object)
 
     if cycle_type in "daily" "weekly":
-        removed_list.append(
-            scheduled_job(cycle_object)
+        shrunken_list.append(
+            schedule_job(cycle_object)
         )
 
     elif cycle_type.startswith("custom"):
-        removed_list.append(
-            scheduled_job(cycle_object)
+        shrunken_list.append(
+            schedule_job(cycle_object)
         )
 
-    return removed_list
+    return shrunken_list
 
 def evaluate_object(cycle_mode: str, cycle_object: object):
     """
@@ -169,19 +150,14 @@ def process_mode(cycle_mode: str, cycle_object: object):
     been determined to run.
     """
 
-    should_run = evaluate_object(
-        cycle_mode,
-        cycle_object
-    )
-
-    if should_run:
+    if evaluate_object(cycle_mode, cycle_object):
         if cycle_mode == "down":
             manage_lock(
                 "add",
                 cycle_object
             )
 
-        history.add_json(
+        history.add_object(
             cycle_mode,
             cycle_object
         )
@@ -228,12 +204,5 @@ def process_items(combined_metrics: list):
         logs.GENERAL_LOGGER.info("Power event has occurred.")
 
     for cycle_object in datafile.read_json(constants.CYCLES_PATH):
-        determine_mode(
-            "down",
-            cycle_object
-        )
-
-        determine_mode(
-            "up",
-            cycle_object
-        )
+        determine_mode("down", cycle_object)
+        determine_mode("up", cycle_object)

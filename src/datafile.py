@@ -5,8 +5,26 @@ persisting application execution.
 
 import os
 import json
+import random
+import string
 
 import logs
+
+def generate_id(string_length: int=40):
+    """
+    Create a random string given
+    string_length.
+    """
+
+    random_string = ""
+
+    for _ in range(string_length):
+        random_string += random.choice(
+            string.ascii_lowercase + \
+            string.ascii_uppercase
+        )
+
+    return random_string
 
 def create_json(file_path: str):
     """

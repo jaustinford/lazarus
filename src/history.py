@@ -8,7 +8,7 @@ from datetime import datetime
 import constants
 import datafile
 
-def add_json(cycle_mode: str, cycle_object: object):
+def add_object(cycle_mode: str, cycle_object: object):
     """
     Open .history.json file, append new
     item and write out to file.
