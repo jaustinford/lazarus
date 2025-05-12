@@ -1,12 +1,14 @@
 ---
 add_job:
   image:
-    name: $ELISE_CI_NEXUS_DOCKER_HOSTED/elise/tommy:$CI_COMMIT_REF_SLUG
+    name: $ELISE_CI_NEXUS_DOCKER_HOSTED/elise/lazarus:$CI_COMMIT_REF_SLUG
   stage: deploy
   needs:
     - job: build_python
       optional: false
   script:
+    - echo ${ELISE_GROUP_B64_SSH_KEY} | base64 -d > ssh.key
+    - chmod 600 ssh.key
     - |
-      ssh austin@172.16.17.4 \
+      ssh austin@172.16.17.4 -i ssh.key \
           "echo \"${ELISE_PIPELINE_JOB_TYPE},${ELISE_PIPELINE_JOB_MODE},${ELISE_PIPELINE_JOB_TRIGGER_DATE},${ELISE_PIPELINE_JOB_TRIGGER_TIME}\" >> data/ingest.csv"
