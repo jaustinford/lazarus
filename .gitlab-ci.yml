@@ -1,5 +1,22 @@
 ---
+variables:
+  ELISE_PIPELINE_JOB_TYPE:
+    description: Must be one of 'manual', 'schedule:daily', 'schedule:weekly', 'schedule:customdays', 'schedule:hourly', or 'schedule:customhours'.
+
+  ELISE_PIPELINE_JOB_MODE:
+    description: Must be one of 'down' or 'up'.
+
+  ELISE_PIPELINE_JOB_TRIGGER_DATE:
+    description: Must be in ISO-8601 date format ie. YYYY-MM-DD
+
+  ELISE_PIPELINE_JOB_TRIGGER_TIME:
+    description: Must bin in ISO-8601 time format ie. HH:MM:SS
+
 include:
   - project: elise/shared-cicd
     ref: main
     file: .gitlab-ci.yml
+
+  - local: ci/add-job.yml
+    rules:
+      - if: $CI_PIPELINE_SOURCE == "web"

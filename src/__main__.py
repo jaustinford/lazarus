@@ -24,11 +24,10 @@ def main():
     apc.service_init()
 
     while True:
-        combined_metrics = []
         combined_metrics = apc.combine_metrics(constants.CONF_DIR)
 
         if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
-            if not os.path.isfile(constants.JOBS_LOCK_PATH):
+            if not os.path.isfile(constants.DOWN_LOCK_PATH):
                 apc.process_elastic(combined_metrics)
 
             elastic_counter = 0
