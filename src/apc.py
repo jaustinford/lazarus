@@ -22,23 +22,23 @@ def service_init():
         logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
         start_daemon(conf_file)
 
-# def determine_power_event(combined_metrics: list):
-#     """
-#     Return true if metrics show a
-#     status for any UPS other than
-#     'ONLINE'.
-#     """
+def determine_power_event(combined_metrics: list):
+    """
+    Return true if metrics show a
+    status for any UPS other than
+    'ONLINE'.
+    """
 
-#     status_event = False
+    status_event = False
 
-#     for combined_metric in combined_metrics:
-#         metric_status = combined_metric["status"]
+    for combined_metric in combined_metrics:
+        metric_status = combined_metric["status"]
 
-#         if metric_status != "ONLINE":
-#             status_event = True
-#             break
+        if metric_status != "ONLINE":
+            status_event = True
+            break
 
-#     return status_event
+    return status_event
 
 def process_elastic(combined_metrics: list):
     """

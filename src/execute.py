@@ -9,6 +9,7 @@ import constants
 import logs
 import datafile
 import ingest
+import apc
 import jobs
 import schedule
 
@@ -95,6 +96,9 @@ def process_jobs(combined_metrics: list):
     """
 
     datafile.create_json(constants.JOBS_PATH)
+
+    if apc.determine_power_event(combined_metrics):
+        logs.GENERAL_LOGGER.info("UPS power event has occurred.")
 
     for job_object in datafile.read_json(constants.JOBS_PATH):
         process_mode(job_object)
