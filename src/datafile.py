@@ -13,7 +13,7 @@ import logs
 def generate_id(string_length: int=40):
     """
     Create a random string given
-    string_length.
+    'string_length'.
     """
 
     random_string = ""
@@ -48,7 +48,7 @@ def create_json(file_path: str):
 
 def read_json(file_path: str):
     """
-    Open JSON data file and assign as
+    Open JSON data file and create as
     a JSON object.
     """
 
@@ -68,7 +68,7 @@ def write_json(file_path: str, file_list: list):
 
     file_name = os.path.basename(file_path).split('.')[-2]
 
-    logs.GENERAL_LOGGER.info("Writing %s", file_name + " file : " + file_path)
+    logs.GENERAL_LOGGER.info("Writing to %s", file_name + " file : " + file_path)
     with open(file_path, "w", encoding="utf-8") as file_opened:
         file_opened.write(
             json.dumps(

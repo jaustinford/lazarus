@@ -22,28 +22,28 @@ def service_init():
         logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
         start_daemon(conf_file)
 
-def determine_power_event(combined_metrics: list):
-    """
-    Return true if metrics show a
-    status for any UPS other than
-    ONLINE.
-    """
+# def determine_power_event(combined_metrics: list):
+#     """
+#     Return true if metrics show a
+#     status for any UPS other than
+#     'ONLINE'.
+#     """
 
-    status_event = False
+#     status_event = False
 
-    for combined_metric in combined_metrics:
-        metric_status = combined_metric["status"]
+#     for combined_metric in combined_metrics:
+#         metric_status = combined_metric["status"]
 
-        if metric_status != "ONLINE":
-            status_event = True
-            break
+#         if metric_status != "ONLINE":
+#             status_event = True
+#             break
 
-    return status_event
+#     return status_event
 
 def process_elastic(combined_metrics: list):
     """
     Iterate over combined UPS metrics
-    and process into Elasticsearch.
+    and upload to Elasticsearch.
     """
 
     es_client = elastic.connect_elasticsearch()
@@ -93,7 +93,7 @@ def get_metrics(daemon_port: int):
 def find_conf_files(conf_dir: str):
     """
     Return a list of the conf files
-    presented in /lazarus/conf.
+    presented in project conf directory.
     """
 
     conf_files = []
@@ -111,7 +111,8 @@ def find_conf_files(conf_dir: str):
 def find_ups_nisport(conf_file: str):
     """
     Read the conf file for a given UPS
-    and return the configured NISPORT.
+    and return the configured 'NISPORT'
+    value.
     """
 
     with open(conf_file, "r", encoding="utf-8") as conf_opened:
@@ -129,8 +130,8 @@ def find_ups_nisport(conf_file: str):
 
 def combine_metrics(conf_dir: str):
     """
-    Create a list for each UPS with
-    parsed metric values.
+    Create a list combining the metrics
+    for each UPS.
     """
 
     combined_metrics = []
@@ -147,7 +148,7 @@ def combine_metrics(conf_dir: str):
                 "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
                 "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
                 "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
-                "timestamp": datetime.now(timezone.utc).strftime(constants.TIME_FORMAT)
+                "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
             }
         )
 

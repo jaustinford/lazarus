@@ -1,5 +1,6 @@
 """
-Create logging object with options.
+Create logging objects and set
+global logging configurations.
 """
 
 import logging

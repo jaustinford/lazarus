@@ -1,38 +1,42 @@
 """
-Monitor UPS metric data to determine
-when to execute power cycle jobs as
-well as ingest UPS metric data to
-Elasticsearch.
+Execute IAC-Configure down or up
+cycles given different kinds of
+events.
 """
 
 import os
 import time
 
 import constants
-import cycles
+import execute
 import apc
 
 def main():
     """
-    Main loop execution.
+    Grab metric data and upload to Elasticsearch
+    every 'constants.ELASTIC_INGEST_INTERVAL'
+    number of seconds, then process jobs.json
+    items.
     """
 
-    increment_counter = 0
+    elastic_counter = 0
 
     apc.service_init()
 
     while True:
+        combined_metrics = []
         combined_metrics = apc.combine_metrics(constants.CONF_DIR)
 
-        if increment_counter == 20:
-            if not os.path.isfile(constants.CYCLES_LOCK_PATH):
+        if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
+            if not os.path.isfile(constants.JOBS_LOCK_PATH):
                 apc.process_elastic(combined_metrics)
 
-            increment_counter = 0
+            elastic_counter = 0
 
-        increment_counter += 1
+        elastic_counter += 1
 
-        cycles.process_items(combined_metrics)
+        execute.process_ingest()
+        execute.process_jobs(combined_metrics)
         time.sleep(1)
 
 if __name__ == "__main__":
