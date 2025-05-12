@@ -22,6 +22,8 @@ def create_file(file_path: str):
         with open(file_path, "w", encoding="utf-8") as file_opened:
             file_opened.write("")
 
+        os.chmod(file_path, 0o666)
+
 def read_file(file_path: str):
     """
     Return a list of each line discovered
