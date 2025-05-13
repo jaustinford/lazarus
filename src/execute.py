@@ -12,6 +12,7 @@ import ingest
 import apc
 import jobs
 import schedule
+import power
 
 def run_cycle(job_mode: str):
     """
@@ -21,7 +22,8 @@ def run_cycle(job_mode: str):
 
     logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode...")
     os.environ["CYCLE_MODE"] = job_mode
-    os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
+    # os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
+    logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode...")
 
 def process_schedule(job_object: object):
     """
@@ -33,10 +35,53 @@ def process_schedule(job_object: object):
     job_type = job_object["type"]
 
     if job_type.startswith("schedule"):
-        schedule_object = schedule.increment_object(job_object)
+        schedule_object = schedule.create_object(job_object)
 
         added_list = jobs.add_object(schedule_object)
         datafile.write_json(constants.JOBS_PATH, added_list)
+
+def process_power(combined_metrics: list):
+    """
+    Conditionalize the creation of power
+    event objects in jobs.json.
+    """
+
+    if not apc.ensure_status("ONLINE", combined_metrics):
+        if not jobs.find_object("power", "down"):
+            logs.GENERAL_LOGGER.info("UPS power event has occurred.")
+
+            power_object = power.create_object("down")
+            added_list   = jobs.add_object(power_object)
+
+            datafile.write_json(constants.JOBS_PATH, added_list)
+
+        else:
+            retrieved_object = jobs.retrieve_object("power", "down")
+            removed_list     = jobs.remove_object(retrieved_object)
+
+            datafile.write_json(constants.JOBS_PATH, removed_list)
+
+            power_object = power.create_object("down")
+            added_list   = jobs.add_object(power_object)
+
+            datafile.write_json(constants.JOBS_PATH, added_list)
+
+    else:
+        if jobs.find_object("power", "down"):
+            retrieved_object = jobs.retrieve_object("power", "down")
+            removed_list     = jobs.remove_object(retrieved_object)
+
+            datafile.write_json(constants.JOBS_PATH, removed_list)
+
+        if not jobs.find_object("power", "up"):
+            if apc.retrieve_min("timeleft") >= constants.POWER_MIN_BATTERY_TOTAL:
+                power_lock = os.path.join(constants.DATA_DIR, "power.lock")
+
+                if os.path.isfile(power_lock):
+                    power_object = power.create_object("up")
+                    added_list   = jobs.add_object(power_object)
+
+                    datafile.write_json(constants.JOBS_PATH, added_list)
 
 def process_mode(job_object: object):
     """
@@ -89,16 +134,13 @@ def process_ingest():
 
         ingest.clear_file(constants.INGEST_PATH)
 
-def process_jobs(combined_metrics: list):
+def process_jobs():
     """
     Iterate over jobs.json and
     process each item.
     """
 
     datafile.create_json(constants.JOBS_PATH)
-
-    if apc.determine_power_event(combined_metrics):
-        logs.GENERAL_LOGGER.info("UPS power event has occurred.")
 
     for job_object in datafile.read_json(constants.JOBS_PATH):
         process_mode(job_object)

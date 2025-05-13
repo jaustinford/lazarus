@@ -13,10 +13,13 @@ FILE_PATH   = os.path.abspath(__file__)
 SRC_DIR     = os.path.dirname(FILE_PATH)
 PROJECT_DIR = os.path.dirname(SRC_DIR)
 
-CONF_DIR       = os.path.join(PROJECT_DIR, "conf")
-DATA_DIR       = os.path.join(PROJECT_DIR, "data")
-INGEST_PATH    = os.path.join(PROJECT_DIR, DATA_DIR, "ingest.csv")
-JOBS_PATH      = os.path.join(PROJECT_DIR, DATA_DIR, "jobs.json")
-DOWN_LOCK_PATH = os.path.join(PROJECT_DIR, DATA_DIR, "down.lock")
+CONF_DIR    = os.path.join(PROJECT_DIR, "conf")
+DATA_DIR    = os.path.join(PROJECT_DIR, "data")
+INGEST_PATH = os.path.join(DATA_DIR, "ingest.csv")
+JOBS_PATH   = os.path.join(DATA_DIR, "jobs.json")
 
 ELASTIC_INGEST_INTERVAL = 20
+TRIGGER_BUFFER_DELTA    = 5
+POWER_MIN_BATTERY_DOWN  = 10
+POWER_MIN_BATTERY_UP    = 20
+POWER_MIN_BATTERY_TOTAL = POWER_MIN_BATTERY_DOWN + POWER_MIN_BATTERY_UP

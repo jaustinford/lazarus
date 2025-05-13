@@ -2,4 +2,4 @@ src/__pycache__
 triggers/__pycache__
 data/jobs.json
 data/ingest.csv
-data/down.lock
+data/*.lock

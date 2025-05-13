@@ -20,25 +20,41 @@ def service_init():
 
     for conf_file in find_conf_files(constants.CONF_DIR):
         logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
+
         start_daemon(conf_file)
 
-def determine_power_event(combined_metrics: list):
+def ensure_status(status_value: str, combined_metrics: list):
     """
-    Return true if metrics show a
-    status for any UPS other than
-    'ONLINE'.
+    Return false if any metrics show
+    a status for any UPS other than
+    'status_value'.
     """
 
-    status_event = False
+    status_ensured = True
 
     for combined_metric in combined_metrics:
         metric_status = combined_metric["status"]
 
-        if metric_status != "ONLINE":
-            status_event = True
+        if metric_status != status_value:
+            status_ensured = False
             break
 
-    return status_event
+    return status_ensured
+
+def retrieve_min(metric_key: str, combined_metrics: list):
+    """
+    Return the smaller value of 'metric_key'
+    from all items within 'combined_metrics'.
+    """
+
+    metric_list = []
+
+    for combined_metric in combined_metrics:
+        metric_list.append(
+            int(combined_metric[metric_key])
+        )
+
+    return min(metric_list)
 
 def process_elastic(combined_metrics: list):
     """
@@ -47,8 +63,6 @@ def process_elastic(combined_metrics: list):
     """
 
     es_client = elastic.connect_elasticsearch()
-
-    logs.GENERAL_LOGGER.info("Connected to Elasticsearch : %s", es_client.info())
 
     if not es_client.indices.exists(index="apcups"):
         elastic.create_index(es_client, "apcups")

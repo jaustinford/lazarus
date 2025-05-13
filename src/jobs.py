@@ -5,11 +5,27 @@ operations.
 """
 
 import os
+import re
 from datetime import datetime, timedelta
 
 import constants
 import logs
 import datafile
+
+def find_locks():
+    """
+    Return true if any of the
+    lock files exist in 'DATA_DIR'.
+    """
+
+    locks_found = False
+
+    for file_name in os.listdir(constants.DATA_DIR):
+        if file_name.endswith(".lock"):
+            locks_found = True
+            break
+
+    return locks_found
 
 def manage_lock(lock_mode: str, job_object: object):
     """
@@ -18,16 +34,26 @@ def manage_lock(lock_mode: str, job_object: object):
     removed.
     """
 
+    job_type       = job_object["type"]
+    job_type_title = re.sub(":", "-", job_type)
+
+    job_lock = os.path.join(
+        constants.DATA_DIR,
+        job_type_title + ".lock"
+    )
+
     if lock_mode == "add":
-        if not os.path.isfile(constants.DOWN_LOCK_PATH):
-            logs.GENERAL_LOGGER.info("Creating down lock file : %s", constants.DOWN_LOCK_PATH)
-            with open(constants.DOWN_LOCK_PATH, "w", encoding="utf-8") as down_lock_opened:
+        if not os.path.isfile(job_lock):
+            logs.GENERAL_LOGGER.info("Creating lock file : %s", job_lock)
+
+            with open(job_lock, "w", encoding="utf-8") as down_lock_opened:
                 down_lock_opened.write(job_object["id"])
 
     elif lock_mode == "remove":
-        if os.path.isfile(constants.DOWN_LOCK_PATH):
-            logs.GENERAL_LOGGER.info("Removing down lock file : %s", constants.DOWN_LOCK_PATH)
-            os.remove(constants.DOWN_LOCK_PATH)
+        if os.path.isfile(job_lock):
+            logs.GENERAL_LOGGER.info("Removing lock file : %s", job_lock)
+
+            os.remove(job_lock)
 
 def add_object(job_object: object):
     """
@@ -73,10 +99,48 @@ def trigger_object(trigger_date: str, trigger_time: str):
 
     real_time_dt   = datetime.now().replace(microsecond=0)
     target_time_dt = datetime.strptime(trigger_datetime, constants.DATETIME_FORMAT)
-    delta_time_dt  = target_time_dt + timedelta(seconds=5)
+    delta_time_dt  = target_time_dt + timedelta(seconds=constants.TRIGGER_BUFFER_DELTA)
 
     if real_time_dt >= target_time_dt:
         if real_time_dt < delta_time_dt:
             should_run = True
 
     return should_run
+
+def find_object(job_type: str, job_mode: str):
+    """
+    Return true if object exists
+    in jobs.json.
+    """
+
+    power_found = False
+
+    for file_object in datafile.read_json(constants.JOBS_PATH):
+        object_type = file_object["type"]
+        object_mode = file_object["mode"]
+
+        if object_type == job_type:
+            if object_mode == job_mode:
+                power_found = True
+                break
+
+    return power_found
+
+def retrieve_object(job_type: str, job_mode: str):
+    """
+    Return an existing object from
+    jobs.json based on 'object_type'.
+    """
+
+    found_object = {}
+
+    for file_object in datafile.read_json(constants.JOBS_PATH):
+        object_type = file_object["type"]
+        object_mode = file_object["mode"]
+
+        if object_type == job_type:
+            if object_mode == job_mode:
+                file_object = found_object
+                break
+
+    return found_object

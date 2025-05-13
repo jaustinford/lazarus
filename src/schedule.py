@@ -30,6 +30,8 @@ def increment_days(trigger_date: str, schedule_type: str):
 
     delta_date_string = delta_date_dt.strftime(constants.DATE_FORMAT)
 
+    logs.GENERAL_LOGGER.info("Incrementing scheduled job by days : %s", delta_date_string)
+
     return delta_date_string
 
 def increment_hours(trigger_time: str, schedule_type: str):
@@ -50,9 +52,11 @@ def increment_hours(trigger_time: str, schedule_type: str):
 
     delta_time_string = delta_time_dt.strftime(constants.TIME_FORMAT)
 
+    logs.GENERAL_LOGGER.info("Incrementing scheduled job by hours : %s", delta_time_string)
+
     return delta_time_string
 
-def increment_object(job_object: object):
+def create_object(job_object: object):
     """
     Direct incrementation of datetime
     fields based on 'job_type' values.
@@ -71,13 +75,11 @@ def increment_object(job_object: object):
         incremented_days  = increment_days(job_trigger_date, schedule_type_join)
         incremented_hours = job_trigger_time
 
-        logs.GENERAL_LOGGER.info("Incrementing scheduled job by days : %s", incremented_days)
-
     elif schedule_type_join.startswith(("hourly", "customhours")):
         incremented_days  = job_trigger_date
         incremented_hours = increment_hours(job_trigger_time, schedule_type_join)
 
-        logs.GENERAL_LOGGER.info("Incrementing scheduled job by hours : %s", incremented_hours)
+    logs.GENERAL_LOGGER.info("Creating schedule job : %s", job_id)
 
     return {
         "id": job_id,
