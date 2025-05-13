@@ -54,7 +54,9 @@ def retrieve_min(metric_key: str, combined_metrics: list):
             combined_metric[metric_key]
         )
 
-    return min(metric_list)
+    min_value = min(metric_list)
+
+    return int(min_value)
 
 def process_elastic(combined_metrics: list):
     """
