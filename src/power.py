@@ -20,7 +20,9 @@ def increment_minutes(job_mode: str, combined_metrics: list):
     real_time_dt = datetime.now().replace(microsecond=0)
 
     if job_mode == "down":
-        battery_remain = apc.retrieve_min("timeleft", combined_metrics) - constants.POWER_MIN_BATTERY_DOWN
+        battery_remain = \
+            apc.retrieve_min("timeleft", combined_metrics) - constants.POWER_MIN_BATTERY_DOWN
+
         delta_time_dt  = real_time_dt + timedelta(minutes=battery_remain)
 
     elif job_mode == "up":
