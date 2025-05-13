@@ -51,7 +51,7 @@ def retrieve_min(metric_key: str, combined_metrics: list):
 
     for combined_metric in combined_metrics:
         metric_list.append(
-            int(combined_metric[metric_key])
+            combined_metric[metric_key]
         )
 
     return min(metric_list)
