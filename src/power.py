@@ -28,7 +28,7 @@ def increment_minutes(job_mode: str, combined_metrics: list):
     elif job_mode == "up":
         delta_time_dt = real_time_dt
 
-    delta_time_string = datetime.strptime(delta_time_dt, constants.DATETIME_FORMAT)
+    delta_time_string = datetime.strftime(delta_time_dt, constants.DATETIME_FORMAT)
     job_delta_string  = job_mode + ":" + delta_time_string
 
     logs.GENERAL_LOGGER.info("Incrementing power job by minutes : %s", job_delta_string)
