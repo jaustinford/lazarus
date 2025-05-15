@@ -129,7 +129,8 @@ def find_object(job_type: str, job_mode: str):
 def retrieve_object(job_type: str, job_mode: str):
     """
     Return an existing object from
-    jobs.json based on 'object_type'.
+    jobs.json based on 'object_type'
+    and 'object_mode'.
     """
 
     found_object = {}
@@ -140,7 +141,7 @@ def retrieve_object(job_type: str, job_mode: str):
 
         if object_type == job_type:
             if object_mode == job_mode:
-                file_object = found_object
+                found_object = file_object
                 break
 
     return found_object
