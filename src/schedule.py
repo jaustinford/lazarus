@@ -29,8 +29,9 @@ def increment_days(trigger_date: str, schedule_type: str):
         delta_date_dt   = job_mode_dt + timedelta(days=delta_date_days)
 
     delta_date_string = delta_date_dt.strftime(constants.DATE_FORMAT)
+    job_delta_string  = schedule_type + " - " + delta_date_string
 
-    logs.GENERAL_LOGGER.info("Incrementing scheduled job by days : %s", delta_date_string)
+    logs.GENERAL_LOGGER.info("Incrementing scheduled job by days : %s", job_delta_string)
 
     return delta_date_string
 
@@ -51,8 +52,9 @@ def increment_hours(trigger_time: str, schedule_type: str):
         delta_time_dt    = job_mode_dt + timedelta(hours=delta_time_hours)
 
     delta_time_string = delta_time_dt.strftime(constants.TIME_FORMAT)
+    job_time_string   = schedule_type + " - " + delta_time_string
 
-    logs.GENERAL_LOGGER.info("Incrementing scheduled job by hours : %s", delta_time_string)
+    logs.GENERAL_LOGGER.info("Incrementing scheduled job by hours : %s", job_time_string)
 
     return delta_time_string
 

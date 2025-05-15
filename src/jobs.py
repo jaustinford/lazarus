@@ -63,9 +63,12 @@ def add_object(job_object: object):
 
     added_list = []
 
+    job_id = job_object["id"]
+
     for file_object in datafile.read_json(constants.JOBS_PATH):
         added_list.append(file_object)
 
+    logs.GENERAL_LOGGER.info("Adding object to jobs.json : %s", job_id)
     added_list.append(job_object)
 
     return added_list
@@ -83,6 +86,8 @@ def remove_object(job_object: object):
     for file_object in datafile.read_json(constants.JOBS_PATH):
         if file_object["id"] != job_id:
             removed_list.append(file_object)
+
+    logs.GENERAL_LOGGER.info("Removing object from jobs.json : %s", job_id)
 
     return removed_list
 
@@ -103,6 +108,7 @@ def trigger_object(trigger_date: str, trigger_time: str):
 
     if real_time_dt >= target_time_dt:
         if real_time_dt < delta_time_dt:
+            logs.GENERAL_LOGGER.info("Trigger event has occured")
             should_run = True
 
     return should_run

@@ -68,7 +68,6 @@ def write_json(file_path: str, file_list: list):
 
     file_name = os.path.basename(file_path).split('.')[-2]
 
-    logs.GENERAL_LOGGER.info("Writing to %s", file_name + " file : " + file_path)
     with open(file_path, "w", encoding="utf-8") as file_opened:
         file_opened.write(
             json.dumps(

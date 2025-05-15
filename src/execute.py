@@ -20,10 +20,10 @@ def run_cycle(job_mode: str):
     CYCLE_MODE as either 'up' or 'down'.
     """
 
-    logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode...")
+    logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode")
     os.environ["CYCLE_MODE"] = job_mode
     os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
-    logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode...")
+    logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
 
 def process_schedule(job_object: object):
     """
