@@ -41,7 +41,8 @@ def create_object(job_mode: str, combined_metrics: list):
     recently polled UPS metric data.
     """
 
-    job_id = datafile.generate_id()
+    job_id      = datafile.generate_id()
+    job_trigger = increment_minutes(job_mode, combined_metrics)
 
     logs.GENERAL_LOGGER.info("Creating power job : %s", job_id)
 
@@ -50,7 +51,7 @@ def create_object(job_mode: str, combined_metrics: list):
         "type": "power",
         "mode": job_mode,
         "trigger": {
-            "date": str(increment_minutes(job_mode, combined_metrics).date()),
-            "time": str(increment_minutes(job_mode, combined_metrics).time())
+            "date": str(job_trigger.date()),
+            "time": str(job_trigger.time())
         }
     }

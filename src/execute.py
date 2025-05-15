@@ -73,6 +73,8 @@ def process_power(combined_metrics: list):
 
             datafile.write_json(constants.JOBS_PATH, removed_list)
 
+            logs.GENERAL_LOGGER.info("UPS power event has cleared.")
+
         if not jobs.find_object("power", "up"):
             if apc.retrieve_min("timeleft", combined_metrics) >= constants.POWER_MIN_BATTERY_TOTAL:
                 power_lock = os.path.join(constants.DATA_DIR, "power.lock")
