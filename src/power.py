@@ -50,7 +50,7 @@ def create_object(job_mode: str, combined_metrics: list):
         "type": "power",
         "mode": job_mode,
         "trigger": {
-            "date": increment_minutes(job_mode, combined_metrics).date(),
-            "time": increment_minutes(job_mode, combined_metrics).time()
+            "date": str(increment_minutes(job_mode, combined_metrics).date()),
+            "time": str(increment_minutes(job_mode, combined_metrics).time())
         }
     }
