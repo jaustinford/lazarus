@@ -23,17 +23,50 @@ def connect_elasticsearch():
 
     return es_client
 
+def create_lifecycle_policy(es_client: Elasticsearch, index_name: str):
+    """
+    Set up a rollover index management
+    policy for the index.
+    """
+
+    es_client.ilm.put_lifecycle(
+        policy=index_name + "-policy",
+        body={
+            "policy": {
+                "phases": {
+                    "hot": {
+                        "actions": {
+                            "rollover": {
+                                "max_age": "30d",
+                                "max_size": "50gb"
+                            }
+                        }
+                    },
+                    "delete": {
+                        "min_age": "30d",
+                        "actions": {
+                            "delete": {}
+                        }
+                    }
+                }
+            }
+        }
+    )
+
 def create_index(es_client: Elasticsearch, index_name: str):
     """
-    Create Elasticsearch index if
-    missing.
+    Create Elasticsearch index.
     """
 
     es_client.indices.create(
         index=index_name,
+        aliases={
+            index_name + "-rollover": {}
+        },
         settings={
             "number_of_shards": 1,
-            "number_of_replicas": 0
+            "number_of_replicas": 0,
+            "index.lifecycle.name": index_name + "-policy"
         },
         mappings={
             "properties": {
