@@ -46,25 +46,28 @@ def process_power(combined_metrics: list):
     event objects in jobs.json.
     """
 
+    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
+
     if not apc.ensure_status("ONLINE", combined_metrics):
-        if not jobs.find_object("power", "down"):
-            logs.GENERAL_LOGGER.info("UPS power event has occurred.")
+        if not os.path.isfile(power_lock):
+            if not jobs.find_object("power", "down"):
+                logs.GENERAL_LOGGER.info("UPS power event has occurred.")
 
-            power_object = power.create_object("down", combined_metrics)
-            added_list   = jobs.add_object(power_object)
+                power_object = power.create_object("down", combined_metrics)
+                added_list   = jobs.add_object(power_object)
 
-            datafile.write_json(constants.JOBS_PATH, added_list)
+                datafile.write_json(constants.JOBS_PATH, added_list)
 
-        else:
-            retrieved_object = jobs.retrieve_object("power", "down")
-            removed_list     = jobs.remove_object(retrieved_object)
+            else:
+                retrieved_object = jobs.retrieve_object("power", "down")
+                removed_list     = jobs.remove_object(retrieved_object)
 
-            datafile.write_json(constants.JOBS_PATH, removed_list)
+                datafile.write_json(constants.JOBS_PATH, removed_list)
 
-            power_object = power.create_object("down", combined_metrics)
-            added_list   = jobs.add_object(power_object)
+                power_object = power.create_object("down", combined_metrics)
+                added_list   = jobs.add_object(power_object)
 
-            datafile.write_json(constants.JOBS_PATH, added_list)
+                datafile.write_json(constants.JOBS_PATH, added_list)
 
     else:
         if jobs.find_object("power", "down"):
@@ -77,8 +80,6 @@ def process_power(combined_metrics: list):
 
         if not jobs.find_object("power", "up"):
             if apc.retrieve_min("timeleft", combined_metrics) >= constants.POWER_MIN_BATTERY_TOTAL:
-                power_lock = os.path.join(constants.DATA_DIR, "power.lock")
-
                 if os.path.isfile(power_lock):
                     power_object = power.create_object("up", combined_metrics)
                     added_list   = jobs.add_object(power_object)

@@ -33,9 +33,14 @@ def ensure_status(status_value: str, combined_metrics: list):
     status_ensured = True
 
     for combined_metric in combined_metrics:
-        metric_status = combined_metric["status"]
+        metric_upsname = combined_metric["upsname"]
+        metric_status  = combined_metric["status"]
 
         if metric_status != status_value:
+            logs.GENERAL_LOGGER.info(
+                "UPS alerted with status : %s", metric_upsname + " - " + metric_status
+            )
+
             status_ensured = False
             break
 
