@@ -3,50 +3,112 @@ Manage power event objects and
 increment using UPS metric data.
 """
 
-from datetime import datetime, timedelta
+import os
+from datetime import datetime
 
 import constants
 import logs
 import datafile
 import apc
+import jobs
 
-def increment_minutes(job_mode: str, combined_metrics: list):
+def clear_event():
     """
-    Return datetime for power 'down'
-    and 'up' events adjusting timedelta
-    against UPS 'timeleft' metrics.
+    Run tasks to clear power event.
     """
 
-    real_time_dt = datetime.now().replace(microsecond=0)
+    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
 
-    if job_mode == "down":
-        battery_remain = \
-            apc.retrieve_min("timeleft", combined_metrics) - constants.POWER_MIN_BATTERY_DOWN
+    if jobs.find_object("power", "down"):
+        retrieved_object = jobs.retrieve_object("power", "down")
+        removed_list     = jobs.remove_object(retrieved_object)
 
-        if battery_remain <= 0:
-            delta_time_dt = real_time_dt
+        datafile.write_json(constants.JOBS_PATH, removed_list)
+
+        logs.GENERAL_LOGGER.info("UPS power event has cleared.")
+
+    if not jobs.find_object("power", "up"):
+        if os.path.isfile(power_lock):
+            power_object = create_object("up")
+            added_list   = jobs.add_object(power_object)
+
+            datafile.write_json(constants.JOBS_PATH, added_list)
+
+def trigger_event():
+    """
+    Run tasks to trigger power event.
+    """
+
+    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
+
+    if not os.path.isfile(power_lock):
+        if not jobs.find_object("power", "down"):
+            logs.GENERAL_LOGGER.info("UPS power event has occurred.")
+
+            power_object = create_object("down")
+            added_list   = jobs.add_object(power_object)
+
+            datafile.write_json(constants.JOBS_PATH, added_list)
 
         else:
-            delta_time_dt = real_time_dt + timedelta(minutes=battery_remain)
+            retrieved_object = jobs.retrieve_object("power", "down")
+            removed_list     = jobs.remove_object(retrieved_object)
 
-    elif job_mode == "up":
-        delta_time_dt = real_time_dt
+            datafile.write_json(constants.JOBS_PATH, removed_list)
 
-    delta_time_string = datetime.strftime(delta_time_dt, constants.DATETIME_FORMAT)
-    job_delta_string  = job_mode + " - " + delta_time_string
+            power_object = create_object("down")
+            added_list   = jobs.add_object(power_object)
 
-    logs.GENERAL_LOGGER.info("Incrementing power job by minutes : %s", job_delta_string)
+            datafile.write_json(constants.JOBS_PATH, added_list)
 
-    return delta_time_dt
+def determine_event(status_value: str, combined_metrics: list, mode_counter: tuple):
+    """
+    Increment counters to determine that
+    'status_value' has maintained
+    cumulatively over 'constants.POWER_STATUS_INTERVAL'
+    seconds against a period of
+    'constants.POWER_EVENT_INTERVAL' seconds.
+    """
 
-def create_object(job_mode: str, combined_metrics: list):
+    should_trigger = False
+
+    status_counter = mode_counter[0]
+    event_counter  = mode_counter[1]
+
+    if status_value == "ONBATT":
+        if apc.ensure_status_any("ONBATT", combined_metrics):
+            status_counter += 1
+            event_counter  += 1
+
+        else:
+            if event_counter >= 1:
+                event_counter += 1
+
+    elif status_value == "ONLINE":
+        if apc.ensure_status_all("ONLINE", combined_metrics):
+            status_counter += 1
+            event_counter  += 1
+
+        else:
+            if event_counter >= 1:
+                event_counter += 1
+
+    if event_counter == constants.POWER_EVENT_INTERVAL:
+        if status_counter >= constants.POWER_STATUS_INTERVAL:
+            should_trigger = True
+
+        event_counter = 0
+
+    return (should_trigger, status_counter, event_counter)
+
+def create_object(job_mode: str):
     """
     Generate a power object against
     recently polled UPS metric data.
     """
 
     job_id      = datafile.generate_id()
-    job_trigger = increment_minutes(job_mode, combined_metrics)
+    job_trigger = datetime.now().replace(microsecond=0)
 
     logs.GENERAL_LOGGER.info("Creating power job : %s", job_id)
 

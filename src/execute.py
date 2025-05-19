@@ -25,67 +25,6 @@ def run_cycle(job_mode: str):
     os.system("python /iac-configure/triggers/profile.py > /dev/null 2>&1")
     logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
 
-def process_schedule(job_object: object):
-    """
-    Direct objects of type 'schedule:' and
-    follow along to increment respective datetime
-    fields.
-    """
-
-    job_type = job_object["type"]
-
-    if job_type.startswith("schedule"):
-        schedule_object = schedule.create_object(job_object)
-
-        added_list = jobs.add_object(schedule_object)
-        datafile.write_json(constants.JOBS_PATH, added_list)
-
-def process_power(combined_metrics: list):
-    """
-    Conditionalize the creation of power
-    event objects in jobs.json.
-    """
-
-    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
-
-    if not apc.ensure_status("ONLINE", combined_metrics):
-        if not os.path.isfile(power_lock):
-            if not jobs.find_object("power", "down"):
-                logs.GENERAL_LOGGER.info("UPS power event has occurred.")
-
-                power_object = power.create_object("down", combined_metrics)
-                added_list   = jobs.add_object(power_object)
-
-                datafile.write_json(constants.JOBS_PATH, added_list)
-
-            else:
-                retrieved_object = jobs.retrieve_object("power", "down")
-                removed_list     = jobs.remove_object(retrieved_object)
-
-                datafile.write_json(constants.JOBS_PATH, removed_list)
-
-                power_object = power.create_object("down", combined_metrics)
-                added_list   = jobs.add_object(power_object)
-
-                datafile.write_json(constants.JOBS_PATH, added_list)
-
-    else:
-        if jobs.find_object("power", "down"):
-            retrieved_object = jobs.retrieve_object("power", "down")
-            removed_list     = jobs.remove_object(retrieved_object)
-
-            datafile.write_json(constants.JOBS_PATH, removed_list)
-
-            logs.GENERAL_LOGGER.info("UPS power event has cleared.")
-
-        if not jobs.find_object("power", "up"):
-            if apc.retrieve_min("timeleft", combined_metrics) >= constants.POWER_MIN_BATTERY_TOTAL:
-                if os.path.isfile(power_lock):
-                    power_object = power.create_object("up", combined_metrics)
-                    added_list   = jobs.add_object(power_object)
-
-                    datafile.write_json(constants.JOBS_PATH, added_list)
-
 def process_mode(job_object: object):
     """
     Determine if timedate for object has
@@ -117,6 +56,64 @@ def process_mode(job_object: object):
             if job_type.startswith("schedule"):
                 process_schedule(job_object)
 
+def process_schedule(job_object: object):
+    """
+    Direct objects of type 'schedule:' and
+    follow along to increment respective datetime
+    fields.
+    """
+
+    job_type = job_object["type"]
+
+    if job_type.startswith("schedule"):
+        schedule_object = schedule.create_object(job_object)
+
+        added_list = jobs.add_object(schedule_object)
+        datafile.write_json(constants.JOBS_PATH, added_list)
+
+def process_elastic(combined_metrics: list, elastic_counter: int):
+    """
+    Grab metric data and upload to Elasticsearch
+    every 'constants.ELASTIC_INGEST_INTERVAL'
+    number of seconds.
+    """
+
+    if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
+        if not jobs.find_locks():
+            apc.process_elastic(combined_metrics)
+
+        elastic_counter = 0
+
+    elastic_counter += 1
+
+    return elastic_counter
+
+def process_power(combined_metrics: list, power_counter: tuple):
+    """
+    Conditionalize the creation of power
+    event objects in jobs.json.
+    """
+
+    trigger_counter = (power_counter[0], power_counter[1])
+    clear_counter   = (power_counter[2], power_counter[3])
+
+    determined_trigger = power.determine_event("ONBATT", combined_metrics, trigger_counter)
+    determined_clear   = power.determine_event("ONLINE", combined_metrics, clear_counter)
+
+    if determined_trigger[0]:
+        power.trigger_event()
+
+    else:
+        if determined_clear[0]:
+            power.clear_event()
+
+    return (
+        determined_trigger[1],
+        determined_trigger[2],
+        determined_clear[1],
+        determined_clear[2]
+    )
+
 def process_ingest():
     """
     Read ingest.csv and generate jobs.json
@@ -147,20 +144,3 @@ def process_jobs():
 
     for job_object in datafile.read_json(constants.JOBS_PATH):
         process_mode(job_object)
-
-def process_elastic(combined_metrics: list, elastic_counter: int):
-    """
-    Grab metric data and upload to Elasticsearch
-    every 'constants.ELASTIC_INGEST_INTERVAL'
-    number of seconds.
-    """
-
-    if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
-        if not jobs.find_locks():
-            apc.process_elastic(combined_metrics)
-
-        elastic_counter = 0
-
-    elastic_counter += 1
-
-    return elastic_counter

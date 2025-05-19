@@ -23,43 +23,39 @@ def service_init():
 
         start_daemon(conf_file)
 
-def ensure_status(status_value: str, combined_metrics: list):
+def ensure_status_all(status_value: str, combined_metrics: list):
     """
-    Return false if any metrics show
-    a status for any UPS other than
-    'status_value'.
+    Return true if all status fields within
+    'combined_metrics' are 'status_value'.
     """
 
     status_ensured = True
 
     for combined_metric in combined_metrics:
-        metric_upsname = combined_metric["upsname"]
-        metric_status  = combined_metric["status"]
+        metric_status = combined_metric["status"]
 
         if metric_status != status_value:
-            logs.GENERAL_LOGGER.info(
-                "UPS alerted with status : %s", metric_upsname + " - " + metric_status
-            )
-
             status_ensured = False
             break
 
     return status_ensured
 
-def retrieve_min(metric_key: str, combined_metrics: list):
+def ensure_status_any(status_value: str, combined_metrics: list):
     """
-    Return the smaller value of 'metric_key'
-    from all items within 'combined_metrics'.
+    Return true if any of the status fields within
+    'combined_metrics' are 'status_value'.
     """
 
-    metric_list = []
+    status_ensured = False
 
     for combined_metric in combined_metrics:
-        metric_list.append(
-            float(combined_metric[metric_key])
-        )
+        metric_status = combined_metric["status"]
 
-    return min(metric_list)
+        if metric_status == status_value:
+            status_ensured = True
+            break
+
+    return status_ensured
 
 def process_elastic(combined_metrics: list):
     """
