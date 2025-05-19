@@ -17,8 +17,7 @@ def connect_elasticsearch():
         basic_auth=(
             os.environ.get("ELASTICSEARCH_USERNAME"),
             os.environ.get("ELASTICSEARCH_PASSWORD")
-        ),
-        request_timeout=1
+        )
     )
 
     return es_client

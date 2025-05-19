@@ -8,15 +8,12 @@ import time
 
 import constants
 import execute
-import jobs
 import apc
 
 def main():
     """
-    Grab metric data and upload to Elasticsearch
-    every 'constants.ELASTIC_INGEST_INTERVAL'
-    number of seconds, then process jobs.json
-    items.
+    Run project process functions over
+    iterated while loop.
     """
 
     apc.service_init()
@@ -26,15 +23,10 @@ def main():
     while True:
         combined_metrics = apc.combine_metrics(constants.CONF_DIR)
 
-        if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
-            if not jobs.find_locks():
-                apc.process_elastic(combined_metrics)
-
-            elastic_counter = 0
-
-        elastic_counter += 1
-
         execute.process_ingest()
+
+        elastic_counter = execute.process_elastic(combined_metrics, elastic_counter)
+
         execute.process_power(combined_metrics)
         execute.process_jobs()
 

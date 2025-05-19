@@ -147,3 +147,20 @@ def process_jobs():
 
     for job_object in datafile.read_json(constants.JOBS_PATH):
         process_mode(job_object)
+
+def process_elastic(combined_metrics: list, elastic_counter: int):
+    """
+    Grab metric data and upload to Elasticsearch
+    every 'constants.ELASTIC_INGEST_INTERVAL'
+    number of seconds.
+    """
+
+    if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
+        if not jobs.find_locks():
+            apc.process_elastic(combined_metrics)
+
+        elastic_counter = 0
+
+    elastic_counter += 1
+
+    return elastic_counter
