@@ -157,11 +157,17 @@ def combine_metrics(conf_dir: str):
             find_ups_nisport(conf_file)
         )
 
+        try:
+            metric_timeleft = ups_metrics["TIMELEFT"].split(" ")[0]
+
+        except KeyError:
+            metric_timeleft = "0.0"
+
         combined_metrics.append(
             {
                 "upsname": ups_metrics["UPSNAME"],
                 "status": ups_metrics["STATUS"],
-                "timeleft": ups_metrics["TIMELEFT"].split(" ")[0],
+                "timeleft": metric_timeleft,
                 "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
                 "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
                 "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)

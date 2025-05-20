@@ -76,6 +76,9 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
     event_counter  = mode_counter[1]
 
     if status_value == "ONBATT":
+        event_interval  = constants.POWER_TRIGGER_EVENT_INTERVAL
+        status_interval = constants.POWER_TRIGGER_STATUS_INTERVAL
+
         if apc.ensure_status_any("ONBATT", combined_metrics):
             status_counter += 1
             event_counter  += 1
@@ -85,6 +88,9 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
                 event_counter += 1
 
     elif status_value == "ONLINE":
+        event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
+        status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
+
         if apc.ensure_status_all("ONLINE", combined_metrics):
             status_counter += 1
             event_counter  += 1
@@ -93,8 +99,8 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
             if event_counter >= 1:
                 event_counter += 1
 
-    if event_counter == constants.POWER_EVENT_INTERVAL:
-        if status_counter >= constants.POWER_STATUS_INTERVAL:
+    if event_counter == event_interval:
+        if status_counter >= status_interval:
             should_trigger = True
 
         event_counter = 0
