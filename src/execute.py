@@ -80,7 +80,7 @@ def process_elastic(combined_metrics: list, elastic_counter: int):
 
     if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
         if not jobs.find_locks():
-            apc.process_elastic(combined_metrics)
+            apc.ingest_elastic(combined_metrics)
 
         elastic_counter = 0
 

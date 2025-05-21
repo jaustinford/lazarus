@@ -57,7 +57,7 @@ def ensure_status_any(status_value: str, combined_metrics: list):
 
     return status_ensured
 
-def process_elastic(combined_metrics: list):
+def ingest_elastic(combined_metrics: list):
     """
     Iterate over combined UPS metrics
     and upload to Elasticsearch.
@@ -70,7 +70,6 @@ def process_elastic(combined_metrics: list):
         elastic.create_index(es_client, "apcups")
 
     for combined_metric in combined_metrics:
-        logs.GENERAL_LOGGER.info("UPS metrics ingested : %s", str(combined_metric))
         es_client.index(
             index="apcups",
             document=combined_metric
@@ -163,15 +162,17 @@ def combine_metrics(conf_dir: str):
         except KeyError:
             metric_timeleft = "0.0"
 
-        combined_metrics.append(
-            {
-                "upsname": ups_metrics["UPSNAME"],
-                "status": ups_metrics["STATUS"],
-                "timeleft": metric_timeleft,
-                "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
-                "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
-                "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
-            }
-        )
+        combined_metric = {
+            "upsname": ups_metrics["UPSNAME"],
+            "status": ups_metrics["STATUS"],
+            "timeleft": metric_timeleft,
+            "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
+            "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
+            "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
+        }
+
+        logs.GENERAL_LOGGER.info("UPS metrics found : %s", str(combined_metric))
+
+        combined_metrics.append(combined_metric)
 
     return combined_metrics
