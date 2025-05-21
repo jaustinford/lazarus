@@ -162,17 +162,15 @@ def combine_metrics(conf_dir: str):
         except KeyError:
             metric_timeleft = "0.0"
 
-        combined_metric = {
-            "upsname": ups_metrics["UPSNAME"],
-            "status": ups_metrics["STATUS"],
-            "timeleft": metric_timeleft,
-            "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
-            "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
-            "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
-        }
-
-        logs.GENERAL_LOGGER.info("UPS metrics found : %s", str(combined_metric))
-
-        combined_metrics.append(combined_metric)
+        combined_metrics.append(
+            {
+                "upsname": ups_metrics["UPSNAME"],
+                "status": ups_metrics["STATUS"],
+                "timeleft": metric_timeleft,
+                "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
+                "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
+                "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
+            }
+        )
 
     return combined_metrics
