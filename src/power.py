@@ -90,10 +90,10 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
                 event_counter += 1
 
     elif status_value == "ONLINE":
-        if os.path.isfile(power_lock):
-            event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
-            status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
+        event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
+        status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
 
+        if os.path.isfile(power_lock):
             if apc.ensure_status_all("ONLINE", combined_metrics):
                 status_counter += 1
                 event_counter  += 1
