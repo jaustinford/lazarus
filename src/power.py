@@ -75,6 +75,8 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
     status_counter = mode_counter[0]
     event_counter  = mode_counter[1]
 
+    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
+
     if status_value == "ONBATT":
         event_interval  = constants.POWER_TRIGGER_EVENT_INTERVAL
         status_interval = constants.POWER_TRIGGER_STATUS_INTERVAL
@@ -88,20 +90,22 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
                 event_counter += 1
 
     elif status_value == "ONLINE":
-        event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
-        status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
+        if os.path.isfile(power_lock):
+            event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
+            status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
 
-        if apc.ensure_status_all("ONLINE", combined_metrics):
-            status_counter += 1
-            event_counter  += 1
+            if apc.ensure_status_all("ONLINE", combined_metrics):
+                status_counter += 1
+                event_counter  += 1
 
-        else:
-            if event_counter >= 1:
-                event_counter += 1
+            else:
+                if event_counter >= 1:
+                    event_counter += 1
 
     if event_counter == event_interval:
         if status_counter >= status_interval:
             should_trigger = True
+            status_counter = 0
 
         event_counter = 0
 
@@ -119,7 +123,7 @@ def create_object(job_mode: str):
     logs.GENERAL_LOGGER.info("Creating power job : %s", job_id)
 
     return {
-        "id": datafile.generate_id(),
+        "id": job_id,
         "type": "power",
         "mode": job_mode,
         "trigger": {
