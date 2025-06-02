@@ -12,54 +12,19 @@ import datafile
 import apc
 import jobs
 
-def clear_event():
+def add_event(event_type: str, event_mode: str):
     """
-    Run tasks to clear power event.
-    """
-
-    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
-
-    if jobs.find_object("power", "down"):
-        retrieved_object = jobs.retrieve_object("power", "down")
-        removed_list     = jobs.remove_object(retrieved_object)
-
-        datafile.write_json(constants.JOBS_PATH, removed_list)
-
-        logs.GENERAL_LOGGER.info("UPS power event has cleared.")
-
-    if not jobs.find_object("power", "up"):
-        if os.path.isfile(power_lock):
-            power_object = create_object("up")
-            added_list   = jobs.add_object(power_object)
-
-            datafile.write_json(constants.JOBS_PATH, added_list)
-
-def trigger_event():
-    """
-    Run tasks to trigger power event.
+    Run tasks to create power event which
+    can be one of two 'event_type's :
+    'trigger' or 'clear'.
     """
 
-    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
+    logs.GENERAL_LOGGER.info("Power " + event_type + " event has been confirmed")
 
-    if not os.path.isfile(power_lock):
-        if not jobs.find_object("power", "down"):
-            logs.GENERAL_LOGGER.info("UPS power event has occurred.")
+    power_object = create_object(event_mode)
+    added_list   = jobs.add_object(power_object)
 
-            power_object = create_object("down")
-            added_list   = jobs.add_object(power_object)
-
-            datafile.write_json(constants.JOBS_PATH, added_list)
-
-        else:
-            retrieved_object = jobs.retrieve_object("power", "down")
-            removed_list     = jobs.remove_object(retrieved_object)
-
-            datafile.write_json(constants.JOBS_PATH, removed_list)
-
-            power_object = create_object("down")
-            added_list   = jobs.add_object(power_object)
-
-            datafile.write_json(constants.JOBS_PATH, added_list)
+    datafile.write_json(constants.JOBS_PATH, added_list)
 
 def determine_event(status_value: str, combined_metrics: list, mode_counter: tuple):
     """
@@ -85,6 +50,9 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
             status_counter += 1
             event_counter  += 1
 
+            if status_counter == 1:
+                logs.GENERAL_LOGGER.info("Power trigger event detected")
+
         else:
             if event_counter >= 1:
                 event_counter += 1
@@ -97,6 +65,9 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
             if apc.ensure_status_all("ONLINE", combined_metrics):
                 status_counter += 1
                 event_counter  += 1
+
+                if status_counter == 1:
+                    logs.GENERAL_LOGGER.info("Power clear event detected")
 
             else:
                 if event_counter >= 1:

@@ -104,11 +104,11 @@ def process_power(combined_metrics: list, power_counter: tuple):
     determined_clear   = power.determine_event("ONLINE", combined_metrics, clear_counter)
 
     if determined_trigger[0]:
-        power.trigger_event()
+        power.add_event("trigger", "down")
 
     else:
         if determined_clear[0]:
-            power.clear_event()
+            power.add_event("clear", "up")
 
     return (
         determined_trigger[1],
