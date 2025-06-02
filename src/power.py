@@ -19,7 +19,7 @@ def add_event(event_type: str, event_mode: str):
     'trigger' or 'clear'.
     """
 
-    logs.GENERAL_LOGGER.info("Power " + event_type + " event has been confirmed")
+    logs.GENERAL_LOGGER.info("Power event has been confirmed : %s", event_type)
 
     power_object = create_object(event_mode)
     added_list   = jobs.add_object(power_object)
