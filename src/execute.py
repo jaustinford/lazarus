@@ -104,7 +104,8 @@ def process_power(combined_metrics: list, power_counter: tuple):
     determined_clear   = power.determine_event("ONLINE", combined_metrics, clear_counter)
 
     if determined_trigger[0]:
-        power.add_event("trigger", "down")
+        if not os.path.join(constants.DATA_DIR, "power.lock"):
+            power.add_event("trigger", "down")
 
     else:
         if determined_clear[0]:
