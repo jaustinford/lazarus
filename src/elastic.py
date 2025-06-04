@@ -4,8 +4,8 @@ into Elasticsearch.
 """
 
 import os
-from elasticsearch import Elasticsearch
 from datetime import datetime
+from elasticsearch import Elasticsearch
 
 def connect_elasticsearch():
     """
