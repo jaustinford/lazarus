@@ -62,9 +62,9 @@ def create_index(es_client: Elasticsearch, index_name: str):
 
     es_client.indices.create(
         index=index_name + "-" + \
-            str(real_time_date).split("-", maxsplit=1)[0] + "." + \
-            str(real_time_date).split("-", maxsplit=1)[1] + "." + \
-            str(real_time_date).split("-", maxsplit=1)[2] + "-" + \
+            str(real_time_date).split("-", maxsplit=2)[0] + "." + \
+            str(real_time_date).split("-", maxsplit=2)[1] + "." + \
+            str(real_time_date).split("-", maxsplit=2)[2] + "-" + \
             "001",
         aliases={
             index_name + "-rollover": {}
