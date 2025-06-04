@@ -72,7 +72,8 @@ def create_index(es_client: Elasticsearch, index_name: str):
         settings={
             "number_of_shards": 1,
             "number_of_replicas": 0,
-            "index.lifecycle.name": index_name + "-policy"
+            "index.lifecycle.name": index_name + "-policy",
+            "index.lifecycle.rollover_alias": index_name + "-metric-data"
         },
         mappings={
             "properties": {
