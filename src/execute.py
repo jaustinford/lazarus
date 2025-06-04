@@ -100,21 +100,22 @@ def process_power(combined_metrics: list, power_counter: tuple):
     trigger_counter = (power_counter[0], power_counter[1])
     clear_counter   = (power_counter[2], power_counter[3])
 
+    power_lock = os.path.join(constants.DATA_DIR, "power.lock")
+
     determined_trigger = power.determine_event("ONBATT", combined_metrics, trigger_counter)
     determined_clear   = power.determine_event("ONLINE", combined_metrics, clear_counter)
 
     if determined_trigger[0]:
-        power.add_event("trigger", "down")
+        if not os.path.isfile(power_lock):
+            power.add_event("trigger", "down")
 
     else:
         if determined_clear[0]:
             power.add_event("clear", "up")
 
     return (
-        determined_trigger[1],
-        determined_trigger[2],
-        determined_clear[1],
-        determined_clear[2]
+        determined_trigger[1], determined_trigger[2],
+        determined_clear[1], determined_clear[2]
     )
 
 def process_ingest():
