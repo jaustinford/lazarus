@@ -65,13 +65,13 @@ def ingest_elastic(combined_metrics: list):
 
     es_client = elastic.connect_elasticsearch()
 
-    if not es_client.indices.exists(index="apcups"):
+    if not es_client.indices.exists(index="apcups-metric-data"):
         elastic.create_lifecycle_policy(es_client, "apcups")
         elastic.create_index(es_client, "apcups")
 
     for combined_metric in combined_metrics:
         es_client.index(
-            index="apcups",
+            index="apcups-metric-data",
             document=combined_metric
         )
 

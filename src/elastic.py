@@ -67,7 +67,7 @@ def create_index(es_client: Elasticsearch, index_name: str):
             str(real_time_date).split("-", maxsplit=2)[2] + "-" + \
             "001",
         aliases={
-            index_name + "-rollover": {}
+            index_name + "-metric-data": {}
         },
         settings={
             "number_of_shards": 1,
