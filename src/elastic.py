@@ -5,6 +5,7 @@ into Elasticsearch.
 
 import os
 from elasticsearch import Elasticsearch
+from datetime import datetime
 
 def connect_elasticsearch():
     """
@@ -58,7 +59,11 @@ def create_index(es_client: Elasticsearch, index_name: str):
     """
 
     es_client.indices.create(
-        index=index_name,
+        index=index_name + "-" + \
+            str(datetime.now().year()) + "." + \
+            str(datetime.now().month()) + "." + \
+            str(datetime.now().day()) + "-" + \
+            "001",
         aliases={
             index_name + "-rollover": {}
         },
