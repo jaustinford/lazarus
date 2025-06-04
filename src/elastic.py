@@ -30,7 +30,7 @@ def create_lifecycle_policy(es_client: Elasticsearch, index_name: str):
     """
 
     es_client.ilm.put_lifecycle(
-        policy=index_name + "-policy",
+        name=index_name + "-policy",
         body={
             "policy": {
                 "phases": {
