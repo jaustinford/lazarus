@@ -51,7 +51,8 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
             event_counter  += 1
 
             if status_counter == 1:
-                logs.GENERAL_LOGGER.info("Power trigger event detected")
+                if not os.path.isfile(power_lock):
+                    logs.GENERAL_LOGGER.info("Power trigger event detected")
 
         else:
             if event_counter >= 1:
