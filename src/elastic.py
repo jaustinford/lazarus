@@ -60,6 +60,7 @@ def create_index_template(es_client: Elasticsearch, index_root_name: str):
     es_client.indices.put_index_template(
         name=index_root_name,
         body={
+            "index_patterns": ["apcups-*"],
             "template": {
                 "aliases": {
                     index_root_name + "-metric-data": {}
