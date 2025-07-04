@@ -6,6 +6,8 @@ into Elasticsearch.
 import os
 from elasticsearch import Elasticsearch
 
+import logs
+
 def connect_elasticsearch():
     """
     Attempt a connection to an elasticsearch
@@ -27,6 +29,8 @@ def create_lifecycle_policy(es_client: Elasticsearch, index_root_name: str):
     Set up a rollover index management
     policy for the index.
     """
+
+    logs.GENERAL_LOGGER.info("Creating Lifecycle Policy : %s", index_root_name)
 
     es_client.ilm.put_lifecycle(
         name=index_root_name + "-policy",
@@ -57,10 +61,15 @@ def create_index_template(es_client: Elasticsearch, index_root_name: str):
     Create Elasticsearch Index Template.
     """
 
+    logs.GENERAL_LOGGER.info("Creating Index Template : %s", index_root_name)
+
     es_client.indices.put_index_template(
         name=index_root_name,
         body={
-            "index_patterns": [index_root_name + "-*"],
+            "index_patterns": [
+                index_root_name,
+                index_root_name + "-*"
+            ],
             "template": {
                 "aliases": {
                     index_root_name + "-metric-data": {}

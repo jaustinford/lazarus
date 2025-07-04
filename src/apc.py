@@ -68,7 +68,6 @@ def ingest_elastic(combined_metrics: list):
     if not es_client.indices.exists(index="apcups-metric-data"):
         elastic.create_lifecycle_policy(es_client, "apcups")
         elastic.create_index_template(es_client, "apcups")
-        time.sleep(5)
         es_client.indices.create_data_stream(name="apcups")
 
     for combined_metric in combined_metrics:
