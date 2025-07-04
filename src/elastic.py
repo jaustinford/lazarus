@@ -4,7 +4,6 @@ into Elasticsearch.
 """
 
 import os
-from datetime import datetime
 from elasticsearch import Elasticsearch
 
 def connect_elasticsearch():
@@ -23,14 +22,14 @@ def connect_elasticsearch():
 
     return es_client
 
-def create_lifecycle_policy(es_client: Elasticsearch, index_name: str):
+def create_lifecycle_policy(es_client: Elasticsearch, index_root_name: str):
     """
     Set up a rollover index management
     policy for the index.
     """
 
     es_client.ilm.put_lifecycle(
-        name=index_name + "-policy",
+        name=index_root_name + "-policy",
         body={
             "policy": {
                 "phases": {
@@ -53,48 +52,46 @@ def create_lifecycle_policy(es_client: Elasticsearch, index_name: str):
         }
     )
 
-def create_index(es_client: Elasticsearch, index_name: str):
+def create_index_template(es_client: Elasticsearch, index_root_name: str):
     """
-    Create Elasticsearch index.
+    Create Elasticsearch Index Template.
     """
 
-    real_time_date = datetime.now().replace(microsecond=0).date()
-
-    es_client.indices.create(
-        index=index_name + "-" + \
-            str(real_time_date).split("-", maxsplit=2)[0] + "." + \
-            str(real_time_date).split("-", maxsplit=2)[1] + "." + \
-            str(real_time_date).split("-", maxsplit=2)[2] + "-" + \
-            "001",
-        aliases={
-            index_name + "-metric-data": {}
-        },
-        settings={
-            "number_of_shards": 1,
-            "number_of_replicas": 0,
-            "index.lifecycle.name": index_name + "-policy",
-            "index.lifecycle.rollover_alias": index_name + "-metric-data"
-        },
-        mappings={
-            "properties": {
-                "upsname": {
-                    "type": "keyword"
+    es_client.indices.put_index_template(
+        name=index_root_name,
+        body={
+            "template": {
+                "aliases": {
+                    index_root_name + "-metric-data": {}
                 },
-                "status": {
-                    "type": "keyword"
+                "settings": {
+                    "number_of_shards": 1,
+                    "number_of_replicas": 0,
+                    "index.lifecycle.name": index_root_name + "-policy",
+                    "index.lifecycle.rollover_alias": index_root_name + "-metric-data"
                 },
-                "timeleft": {
-                    "type": "float"
-                },
-                "bcharge": {
-                    "type": "float"
-                },
-                "loadpct": {
-                    "type": "float"
-                },
-                "timestamp": {
-                    "type": "date",
-                    "format": "date_time_no_millis"
+                "mappings": {
+                    "properties": {
+                        "upsname": {
+                            "type": "keyword"
+                        },
+                        "status": {
+                            "type": "keyword"
+                        },
+                        "timeleft": {
+                            "type": "float"
+                        },
+                        "bcharge": {
+                            "type": "float"
+                        },
+                        "loadpct": {
+                            "type": "float"
+                        },
+                        "timestamp": {
+                            "type": "date",
+                            "format": "date_time_no_millis"
+                        }
+                    }
                 }
             }
         }
