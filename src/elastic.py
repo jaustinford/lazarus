@@ -62,6 +62,9 @@ def create_index_template(es_client: Elasticsearch, index_root_name: str):
         body={
             "index_patterns": [index_root_name + "-*"],
             "template": {
+                "aliases": {
+                    index_root_name + "-metric-data": {}
+                },
                 "settings": {
                     "number_of_shards": 1,
                     "number_of_replicas": 0,
