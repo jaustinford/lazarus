@@ -66,10 +66,8 @@ def create_index_template(es_client: Elasticsearch, index_root_name: str):
     es_client.indices.put_index_template(
         name=index_root_name,
         body={
-            "index_patterns": [
-                index_root_name,
-                index_root_name + "-*"
-            ],
+            "index_patterns": [index_root_name + "*"],
+            "data_stream": {},
             "template": {
                 "aliases": {
                     index_root_name + "-metric-data": {}
