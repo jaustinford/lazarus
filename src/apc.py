@@ -72,7 +72,7 @@ def ingest_elastic(combined_metrics: list):
 
     for combined_metric in combined_metrics:
         es_client.index(
-            index="apcups-metric-data",
+            index="apcups",
             document=combined_metric
         )
 
