@@ -170,7 +170,7 @@ def combine_metrics(conf_dir: str):
                 "timeleft": metric_timeleft,
                 "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
                 "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
-                "timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
+                "@timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
             }
         )
 

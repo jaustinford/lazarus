@@ -95,7 +95,7 @@ def create_index_template(es_client: Elasticsearch, index_root_name: str):
                         "loadpct": {
                             "type": "float"
                         },
-                        "timestamp": {
+                        "@timestamp": {
                             "type": "date",
                             "format": "date_time_no_millis"
                         }
