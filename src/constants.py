@@ -15,8 +15,8 @@ PROJECT_DIR = os.path.dirname(SRC_DIR)
 
 CONF_DIR    = os.path.join(PROJECT_DIR, "conf")
 DATA_DIR    = os.path.join(PROJECT_DIR, "data")
-INGEST_PATH = os.path.join(DATA_DIR, "ingest.csv")
 JOBS_PATH   = os.path.join(DATA_DIR, "jobs.json")
+INGEST_PATH = "/tmp/ingest.csv"
 
 ELASTIC_INGEST_INTERVAL = 10
 JOB_TRIGGER_DELTA       = 60

@@ -13,4 +13,4 @@ add_job:
       ssh merlin@192.168.40.4 \
           -i ssh.key \
           -o StrictHostKeyChecking=no \
-          "echo \"${ELISE_PIPELINE_JOB_TYPE},${ELISE_PIPELINE_JOB_MODE},${ELISE_PIPELINE_JOB_TRIGGER_DATE},${ELISE_PIPELINE_JOB_TRIGGER_TIME}\" >> /lab/app_data/lazarus/data/ingest.csv"
+          "echo \"${ELISE_PIPELINE_JOB_TYPE},${ELISE_PIPELINE_JOB_MODE},${ELISE_PIPELINE_JOB_TRIGGER_DATE},${ELISE_PIPELINE_JOB_TRIGGER_TIME}\" >> /tmp/ingest.csv"
