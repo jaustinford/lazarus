@@ -13,7 +13,7 @@ variables:
     description: Must bin in ISO-8601 time format ie. HH:MM:SS
 
 include:
-  - project: elise/shared-cicd
+  - project: elise/utilities/shared-cicd
     ref: main
     file: .gitlab-ci.yml
 
