@@ -14,7 +14,7 @@ import jobs
 import schedule
 import power
 
-def run_cycle(iac_configure_dir: str, job_mode: str):
+def run_cycle(job_mode: str):
     """
     Run the IAC-Configure playbook given
     CYCLE_MODE as either 'up' or 'down'.
@@ -26,9 +26,9 @@ def run_cycle(iac_configure_dir: str, job_mode: str):
     os.system(
         "docker compose \
             --profile site \
-            --project-directory " + iac_configure_dir + "\
-            --env-file " + iac_configure_dir + "/env/.env-args \
-            --env-file " + iac_configure_dir + "/env/.env-secrets \
+            --project-directory /lab/app_data/lazarus/iac-configure \
+            --env-file /lab/app_data/lazarus/iac-configure/env/.env-args \
+            --env-file /lab/app_data/lazarus/iac-configure/env/.env-secrets \
             up"
     )
 
@@ -56,10 +56,7 @@ def process_mode(job_object: object):
             if job_type.startswith("schedule"):
                 process_schedule(job_object)
 
-        run_cycle(
-            "/lab/app_data/lazarus/iac-configure",
-            job_mode
-        )
+        run_cycle(job_mode)
 
         if job_mode == "up":
             jobs.manage_lock("remove", job_object)
