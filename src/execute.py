@@ -26,9 +26,9 @@ def run_cycle(job_mode: str):
     os.system(
         "docker compose \
             --profile site \
-            --project-directory /lab/app_data/lazarus/iac-configure \
-            --env-file /lab/app_data/lazarus/iac-configure/env/.env-args \
-            --env-file /lab/app_data/lazarus/iac-configure/env/.env-secrets \
+            --project-directory /iac-configure \
+            --env-file /iac-configure/env/.env-args \
+            --env-file /iac-configure/env/.env-secrets \
             up"
     )
 
