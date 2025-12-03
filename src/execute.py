@@ -23,14 +23,13 @@ def run_cycle(job_mode: str):
     logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode")
     os.environ["CYCLE_MODE"] = job_mode
 
-    os.system(
-        "docker compose \
-            --profile site \
-            --project-directory /iac-configure \
-            --env-file /iac-configure/env/.env-args \
-            --env-file /iac-configure/env/.env-secrets \
-            up"
-    )
+    if job_mode == "up":
+        os.system("docker start site-up &> /dev/null")
+        os.system("docker wait site-up &> /dev/null")
+
+    elif job_mode == "down":
+        os.system("docker start site-down &> /dev/null")
+        os.system("docker wait site-down &> /dev/null")
 
     logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
 
