@@ -24,12 +24,12 @@ def run_cycle(job_mode: str):
     os.environ["CYCLE_MODE"] = job_mode
 
     if job_mode == "up":
-        os.system("docker start site-up &> /dev/null")
-        os.system("docker wait site-up &> /dev/null")
+        os.system("docker start site-up")
+        os.system("docker wait site-up")
 
     elif job_mode == "down":
-        os.system("docker start site-down &> /dev/null")
-        os.system("docker wait site-down &> /dev/null")
+        os.system("docker start site-down")
+        os.system("docker wait site-down")
 
     logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
 
