@@ -27,6 +27,7 @@ RUN \
 RUN \
     pip install \
         apcaccess \
+        hvac \
         elasticsearch==8.13.0
 
 WORKDIR /lazarus

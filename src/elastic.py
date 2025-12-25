@@ -7,6 +7,7 @@ import os
 from elasticsearch import Elasticsearch
 
 import logs
+import infra.vsecrets
 
 def connect_elasticsearch():
     """
@@ -17,8 +18,8 @@ def connect_elasticsearch():
     es_client = Elasticsearch(
         "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
         basic_auth=(
-            os.environ.get("ELASTICSEARCH_USERNAME"),
-            os.environ.get("ELASTICSEARCH_PASSWORD")
+            infra.vsecrets.ELASTICSEARCH_USER,
+            infra.vsecrets.ELASTICSEARCH_PASS
         )
     )
 
