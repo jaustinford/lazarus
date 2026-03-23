@@ -87,9 +87,6 @@ def process_elastic(combined_metrics: list, elastic_counter: int):
     """
 
     if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
-        for combined_metric in combined_metrics:
-            logs.GENERAL_LOGGER.info("UPS metrics found : %s", str(combined_metric))
-
         if not jobs.find_locks():
             apc.ingest_elastic(combined_metrics)
 
