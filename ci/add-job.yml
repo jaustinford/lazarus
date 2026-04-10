@@ -7,10 +7,8 @@ add_job:
     - job: build_python
       optional: false
   script:
-    - echo ${ELISE_GROUP_PRIVILEGED_USER_SSH_KEY_B64} | base64 -d > ssh.key
-    - chmod 600 ssh.key
     - |
-      ssh merlin@192.168.40.4 \
-          -i ssh.key \
+      ssh queen@192.168.40.4 \
+          -i /automation/iac-configure.key \
           -o StrictHostKeyChecking=no \
           "echo \"${ELISE_PIPELINE_JOB_TYPE},${ELISE_PIPELINE_JOB_MODE},${ELISE_PIPELINE_JOB_TRIGGER_DATE},${ELISE_PIPELINE_JOB_TRIGGER_TIME}\" >> /tmp/ingest.csv"
