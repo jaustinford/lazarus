@@ -19,4 +19,9 @@ include:
 
   - local: ci/add-job.yml
     rules:
-      - if: $CI_PIPELINE_SOURCE == "web"
+      - if: |
+          $CI_PIPELINE_SOURCE == "web" &&
+          $ELISE_PIPELINE_JOB_TYPE &&
+          $ELISE_PIPELINE_JOB_MODE &&
+          $ELISE_PIPELINE_JOB_TRIGGER_DATE &&
+          $ELISE_PIPELINE_JOB_TRIGGER_TIME
