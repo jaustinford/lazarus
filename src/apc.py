@@ -97,12 +97,19 @@ def get_metrics(daemon_port: int):
     given the port of the daemon.
     """
 
-    ups_metrics = status.parse(
-        status.get(
-            host="localhost",
-            port=daemon_port
-        )
-    )
+    while True:
+        try:
+            ups_metrics = status.parse(
+                status.get(
+                    host="localhost",
+                    port=daemon_port
+                )
+            )
+
+            break
+
+        except ConnectionRefusedError:
+            logs.GENERAL_LOGGER.error("Waiting on UPS port : %s", int(daemon_port))
 
     return ups_metrics
 
