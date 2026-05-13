@@ -19,9 +19,40 @@ def service_init():
     """
 
     for conf_file in find_conf_files(constants.CONF_DIR):
-        logs.GENERAL_LOGGER.info("Starting APC daemon against conf file : %s", conf_file)
-
         start_daemon(conf_file)
+
+def find_conf_files(conf_dir: str):
+    """
+    Return a list of the conf files
+    presented in project conf directory.
+    """
+
+    conf_files = []
+
+    for conf_file in os.listdir(conf_dir):
+        conf_files.append(
+            os.path.join(
+                conf_dir,
+                conf_file
+            )
+        )
+
+    return conf_files
+
+def start_daemon(conf_file: str):
+    """
+    Start apcupsd daemon and bind a
+    localhost TCP port.
+    """
+
+    logs.GENERAL_LOGGER.info("Starting APC daemon : %s", conf_file)
+
+    os.system(
+        "/sbin/apcupsd \
+            -f " + conf_file
+    )
+
+    time.sleep(10)
 
 def ensure_status_all(status_value: str, combined_metrics: list):
     """
@@ -78,24 +109,13 @@ def ingest_elastic(combined_metrics: list):
 
     es_client.close()
 
-def start_daemon(conf_file: str):
-    """
-    Start apcupsd daemon and bind a
-    localhost TCP port.
-    """
-
-    os.system(
-        "/sbin/apcupsd \
-            -f " + conf_file
-    )
-
-    time.sleep(10)
-
-def get_metrics(daemon_port: int):
+def get_metrics(conf_file: str):
     """
     Poll the UPS for the latest metrics,
     given the port of the daemon.
     """
+
+    daemon_port = find_ups_nisport(conf_file)
 
     while True:
         try:
@@ -109,27 +129,10 @@ def get_metrics(daemon_port: int):
             break
 
         except ConnectionRefusedError:
-            logs.GENERAL_LOGGER.error("Waiting on UPS port : %s", int(daemon_port))
+            logs.GENERAL_LOGGER.error("Connection refused for APC : %s", int(daemon_port))
+            start_daemon(conf_file)
 
     return ups_metrics
-
-def find_conf_files(conf_dir: str):
-    """
-    Return a list of the conf files
-    presented in project conf directory.
-    """
-
-    conf_files = []
-
-    for conf_file in os.listdir(conf_dir):
-        conf_files.append(
-            os.path.join(
-                conf_dir,
-                conf_file
-            )
-        )
-
-    return conf_files
 
 def find_ups_nisport(conf_file: str):
     """
@@ -160,9 +163,7 @@ def combine_metrics(conf_dir: str):
     combined_metrics = []
 
     for conf_file in find_conf_files(conf_dir):
-        ups_metrics = get_metrics(
-            find_ups_nisport(conf_file)
-        )
+        ups_metrics = get_metrics(conf_file)
 
         try:
             metric_timeleft = ups_metrics["TIMELEFT"].split(" ")[0]
