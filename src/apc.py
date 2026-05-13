@@ -129,7 +129,7 @@ def get_metrics(conf_file: str):
             break
 
         except ConnectionRefusedError:
-            logs.GENERAL_LOGGER.error("Connection refused for APC : %s", int(daemon_port))
+            logs.GENERAL_LOGGER.error("Connection refused for APC : %s", str(daemon_port))
             start_daemon(conf_file)
 
     return ups_metrics
