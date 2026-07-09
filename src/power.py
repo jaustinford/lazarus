@@ -56,11 +56,12 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
             if event_counter >= 1:
                 event_counter += 1
 
-        LOGGER.info(
-            "Qualifying power trigger event : %s",
-            "status ( " + str(status_counter) + " ) | " + \
-            "event ( " + str(event_counter) + " )"
-        )
+        if apc.ensure_status_any("ONBATT", combined_metrics):
+            LOGGER.info(
+                "Qualifying power trigger event : %s",
+                "status ( " + str(status_counter) + " ) | " + \
+                "event ( " + str(event_counter) + " )"
+            )
 
     elif status_value == "ONLINE":
         status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
@@ -75,11 +76,12 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
                 if event_counter >= 1:
                     event_counter += 1
 
-            LOGGER.info(
-                "Qualifying power clear event : %s",
-                "status ( " + str(status_counter) + " ) | " + \
-                "event ( " + str(event_counter) + " )"
-            )
+            if apc.ensure_status_all("ONLINE", combined_metrics):
+                LOGGER.info(
+                    "Qualifying power clear event : %s",
+                    "status ( " + str(status_counter) + " ) | " + \
+                    "event ( " + str(event_counter) + " )"
+                )
 
     if event_counter == event_interval:
         if status_counter >= status_interval:
