@@ -33,12 +33,13 @@ def find_conf_files(conf_dir: str):
     conf_files = []
 
     for conf_file in os.listdir(conf_dir):
-        conf_files.append(
-            os.path.join(
-                conf_dir,
-                conf_file
+        if conf_file.endswith(".conf"):
+            conf_files.append(
+                os.path.join(
+                    conf_dir,
+                    conf_file
+                )
             )
-        )
 
     return conf_files
 
