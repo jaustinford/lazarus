@@ -5,6 +5,7 @@ library and manage daemon.
 
 import os
 import subprocess
+import time
 from datetime import datetime, timezone
 from apcaccess import status
 
@@ -52,6 +53,7 @@ def start_daemon(conf_file: str):
             conf_file
         ]
     ) as apc_process:
+        time.sleep(5)
 
         while True:
             try:

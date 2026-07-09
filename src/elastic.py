@@ -16,8 +16,6 @@ def connect_elasticsearch():
     """
 
     if not os.environ.get("ELASTICSEARCH_USER") or not os.environ.get("ELASTICSEARCH_PASS"):
-        logs.GENERAL_LOGGER.info("Resolving Vault secret : lazarus")
-
         vault_token = infra.hvault.approle_login("lazarus")
 
         elasticsearch_auth = infra.hvault.get_secret(
