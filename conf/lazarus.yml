@@ -17,7 +17,7 @@ lazarus:
     date: "%Y-%m-%d"
     time: "%H:%M:%S"
 
-  # upload UPS metrics to Elastic stack every 
+  # upload ups metrics to elastic stack every 
   # 'elastic_interval' seconds.
 
   elastic_interval: 10
@@ -43,8 +43,8 @@ lazarus:
       event: 300
 
     # if all ups devices have a status of 'ONLINE' totaling
-    # 'trigger.status' seconds within a period of
-    # 'trigger.event' seconds, clear event exists.
+    # 'clear.status' seconds within a period of
+    # 'clear.event' seconds, clear event exists.
 
     clear:
       status: 1200
