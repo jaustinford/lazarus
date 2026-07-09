@@ -6,7 +6,7 @@ library and manage daemon.
 import os
 import subprocess
 from datetime import datetime, timezone
-import apcaccess
+from apcaccess import status
 
 import constants
 import logs
@@ -128,8 +128,8 @@ def get_metrics(conf_file: str):
 
     daemon_port = find_ups_nisport(conf_file)
 
-    ups_metrics = apcaccess.status.parse(
-        apcaccess.status.get(
+    ups_metrics = status.parse(
+        status.get(
             host="localhost",
             port=daemon_port
         )
