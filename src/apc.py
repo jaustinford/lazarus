@@ -58,12 +58,12 @@ def start_daemon(conf_file: str):
         while True:
             try:
                 get_metrics(conf_file)
-                logs.GENERAL_LOGGER.info("Connection confirmed for APC : %s", conf_file)
+                logs.GENERAL_LOGGER.info("Connection confirmed to UPS : %s", conf_file)
 
                 break
 
             except ConnectionRefusedError:
-                logs.GENERAL_LOGGER.error("Connection refused for APC : %s", conf_file)
+                logs.GENERAL_LOGGER.error("Connection refused to UPS : %s", conf_file)
                 apc_process.kill()
                 start_daemon(conf_file)
 
