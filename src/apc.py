@@ -45,16 +45,16 @@ def start_daemon(conf_file: str):
     localhost TCP port.
     """
 
+    apc_process = subprocess.Popen(
+        [
+            "/sbin/apcupsd",
+            "-f",
+            conf_file
+        ]
+    )
+
     while True:
         try:
-            apc_process = subprocess.Popen(
-                [
-                    "/sbin/apcupsd",
-                    "-f",
-                    conf_file
-                ]
-            )
-
             get_metrics(conf_file)
             logs.GENERAL_LOGGER.info("Connection confirmed for APC : %s", conf_file)
 
@@ -63,6 +63,7 @@ def start_daemon(conf_file: str):
         except ConnectionRefusedError:
             logs.GENERAL_LOGGER.error("Connection refused for APC : %s", conf_file)
             apc_process.kill()
+            start_daemon(conf_file)
 
 def ensure_status_all(status_value: str, combined_metrics: list):
     """
