@@ -14,13 +14,15 @@ import jobs
 import schedule
 import power
 
+LOGGER = logs.logging.getLogger(__name__)
+
 def run_cycle(job_mode: str):
     """
     Run the IAC-Configure playbook given
     CYCLE_MODE as either 'up' or 'down'.
     """
 
-    logs.GENERAL_LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode")
+    LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode")
     os.environ["CYCLE_MODE"] = job_mode
 
     if job_mode == "up":
@@ -31,7 +33,7 @@ def run_cycle(job_mode: str):
         os.system("docker start site-down")
         os.system("docker wait site-down")
 
-    logs.GENERAL_LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
+    LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
 
 def process_mode(job_object: object):
     """
@@ -50,7 +52,7 @@ def process_mode(job_object: object):
 
         if job_mode == "down":
             jobs.manage_lock("add", job_object)
-            datafile.write_json(constants.JOBS_PATH, removed_list)
+            datafile.write_json(constants.JOBS_FILE, removed_list)
 
             if job_type.startswith("schedule"):
                 process_schedule(job_object)
@@ -59,7 +61,7 @@ def process_mode(job_object: object):
 
         if job_mode == "up":
             jobs.manage_lock("remove", job_object)
-            datafile.write_json(constants.JOBS_PATH, removed_list)
+            datafile.write_json(constants.JOBS_FILE, removed_list)
 
             if job_type.startswith("schedule"):
                 process_schedule(job_object)
@@ -77,7 +79,7 @@ def process_schedule(job_object: object):
         schedule_object = schedule.create_object(job_object)
 
         added_list = jobs.add_object(schedule_object)
-        datafile.write_json(constants.JOBS_PATH, added_list)
+        datafile.write_json(constants.JOBS_FILE, added_list)
 
 def process_elastic(combined_metrics: list, elastic_counter: int):
     """
@@ -88,7 +90,7 @@ def process_elastic(combined_metrics: list, elastic_counter: int):
 
     if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
         for combined_metric in combined_metrics:
-            logs.GENERAL_LOGGER.info("UPS metrics found : %s", str(combined_metric))
+            LOGGER.info("UPS metrics found : %s", str(combined_metric))
 
         if not jobs.find_locks():
             apc.ingest_elastic(combined_metrics)
@@ -132,9 +134,9 @@ def process_ingest():
     objects for each line.
     """
 
-    ingest.create_file(constants.INGEST_PATH)
+    ingest.create_file(constants.INGEST_FILE)
 
-    ingest_readlines = ingest.read_file(constants.INGEST_PATH)
+    ingest_readlines = ingest.read_file(constants.INGEST_FILE)
 
     if ingest_readlines:
         ingest_list = ingest.create_jobs(ingest_readlines)
@@ -142,9 +144,9 @@ def process_ingest():
         for ingest_object in ingest_list:
             added_list = jobs.add_object(ingest_object)
 
-            datafile.write_json(constants.JOBS_PATH, added_list)
+            datafile.write_json(constants.JOBS_FILE, added_list)
 
-        ingest.clear_file(constants.INGEST_PATH)
+        ingest.clear_file(constants.INGEST_FILE)
 
 def process_jobs():
     """
@@ -152,7 +154,7 @@ def process_jobs():
     process each item.
     """
 
-    datafile.create_json(constants.JOBS_PATH)
+    datafile.create_json(constants.JOBS_FILE)
 
-    for job_object in datafile.read_json(constants.JOBS_PATH):
+    for job_object in datafile.read_json(constants.JOBS_FILE):
         process_mode(job_object)

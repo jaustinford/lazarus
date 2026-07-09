@@ -1,0 +1,104 @@
+{
+  "title": "lazarus power cycle system",
+  "description": "main configuration",
+  "properties": {
+    "lazarus": {
+      "type": "object",
+      "description": "parent object",
+      "properties": {
+        "ingest_file": {
+          "type": "string",
+          "description": "location of ingest file",
+          "pattern": "^/tmp/[a-z0-9]+.csv$"
+        },
+        "format": {
+          "type": "object",
+          "description": "define timestamp formats",
+          "properties": {
+            "date": {
+              "type": "string",
+              "description": "format for job date string",
+              "pattern": "^%Y(-|_|:)%m(-|_|:)%d$"
+            },
+            "time": {
+              "type": "string",
+              "description": "format for job time string",
+              "pattern": "^%H(-|_|:)%M(-|_|:)%S$"
+            }
+          },
+          "required": [
+            "date",
+            "time"
+          ]
+        },
+        "elastic_interval": {
+          "type": "number",
+          "description": "upload metrics to elastic every n seconds",
+          "pattern": "^(1|[0-9]{2})$"
+        },
+        "job_execute_delta": {
+          "type": "number",
+          "description": "execute jobs at trigger time + execute delta",
+          "pattern": "^([5-9]|[0-9]{2})$"
+        },
+        "power": {
+          "type": "object",
+          "description": "define power event thresholds",
+          "properties": {
+            "trigger": {
+              "type": "object",
+              "description": "power trigger object",
+              "properties": {
+                "status": {
+                  "type": "number",
+                  "description": "seconds where status is 'ONBATT'",
+                  "pattern": "^([0-9]{3})$"
+                },
+                "event": {
+                  "type": "number",
+                  "description": "total seconds to evaluate trigger event",
+                  "pattern": "^([0-9]{3})$"
+                }
+              },
+              "required": [
+                "status",
+                "event"
+              ]
+            },
+            "clear": {
+              "type": "object",
+              "description": "power clear object",
+              "properties": {
+                "status": {
+                  "type": "number",
+                  "description": "seconds where status is 'ONLINE'",
+                  "pattern": "^([0-9]{4})$"
+                },
+                "event": {
+                  "type": "number",
+                  "description": "total seconds to evaluate clear event",
+                  "pattern": "^([0-9]{4})$"
+                }
+              },
+              "required": [
+                "status",
+                "event"
+              ]
+            }
+          },
+          "required": [
+            "trigger",
+            "clear"
+          ]
+        }
+      },
+      "required": [
+        "ingest_file",
+        "format",
+        "elastic_interval",
+        "job_execute_delta",
+        "power"
+      ]
+    }
+  }
+}

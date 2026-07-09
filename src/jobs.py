@@ -12,6 +12,8 @@ import constants
 import logs
 import datafile
 
+LOGGER = logs.logging.getLogger(__name__)
+
 def find_locks():
     """
     Return true if any of the
@@ -44,14 +46,14 @@ def manage_lock(lock_mode: str, job_object: object):
 
     if lock_mode == "add":
         if not os.path.isfile(job_lock):
-            logs.GENERAL_LOGGER.info("Creating lock file : %s", job_lock)
+            LOGGER.info("Creating lock file : %s", job_lock)
 
             with open(job_lock, "w", encoding="utf-8") as down_lock_opened:
                 down_lock_opened.write(job_object["id"])
 
     elif lock_mode == "remove":
         if os.path.isfile(job_lock):
-            logs.GENERAL_LOGGER.info("Removing lock file : %s", job_lock)
+            LOGGER.info("Removing lock file : %s", job_lock)
 
             os.remove(job_lock)
 
@@ -65,10 +67,10 @@ def add_object(job_object: object):
 
     job_id = job_object["id"]
 
-    for file_object in datafile.read_json(constants.JOBS_PATH):
+    for file_object in datafile.read_json(constants.JOBS_FILE):
         added_list.append(file_object)
 
-    logs.GENERAL_LOGGER.info("Adding object to jobs.json : %s", job_id)
+    LOGGER.info("Adding object to jobs.json : %s", job_id)
     added_list.append(job_object)
 
     return added_list
@@ -83,11 +85,11 @@ def remove_object(job_object: object):
 
     job_id = job_object["id"]
 
-    for file_object in datafile.read_json(constants.JOBS_PATH):
+    for file_object in datafile.read_json(constants.JOBS_FILE):
         if file_object["id"] != job_id:
             removed_list.append(file_object)
 
-    logs.GENERAL_LOGGER.info("Removing object from jobs.json : %s", job_id)
+    LOGGER.info("Removing object from jobs.json : %s", job_id)
 
     return removed_list
 
@@ -104,11 +106,11 @@ def trigger_object(trigger_date: str, trigger_time: str):
 
     real_time_dt   = datetime.now().replace(microsecond=0)
     target_time_dt = datetime.strptime(trigger_datetime_string, constants.DATETIME_FORMAT)
-    delta_time_dt  = target_time_dt + timedelta(seconds=constants.JOB_TRIGGER_DELTA)
+    delta_time_dt  = target_time_dt + timedelta(seconds=constants.JOB_EXECUTE_DELTA)
 
     if real_time_dt >= target_time_dt:
         if real_time_dt < delta_time_dt:
-            logs.GENERAL_LOGGER.info("Trigger event has occured")
+            LOGGER.info("Trigger event has occured")
             should_run = True
 
     return should_run
@@ -121,7 +123,7 @@ def find_object(job_type: str, job_mode: str):
 
     power_found = False
 
-    for file_object in datafile.read_json(constants.JOBS_PATH):
+    for file_object in datafile.read_json(constants.JOBS_FILE):
         object_type = file_object["type"]
         object_mode = file_object["mode"]
 
@@ -141,7 +143,7 @@ def retrieve_object(job_type: str, job_mode: str):
 
     found_object = {}
 
-    for file_object in datafile.read_json(constants.JOBS_PATH):
+    for file_object in datafile.read_json(constants.JOBS_FILE):
         object_type = file_object["type"]
         object_mode = file_object["mode"]
 

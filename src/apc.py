@@ -13,6 +13,8 @@ import constants
 import logs
 import elastic
 
+LOGGER = logs.logging.getLogger(__name__)
+
 def service_init():
     """
     Find available UPS configs and create
@@ -58,12 +60,12 @@ def start_daemon(conf_file: str):
         while True:
             try:
                 get_metrics(conf_file)
-                logs.GENERAL_LOGGER.info("Connection confirmed to UPS : %s", conf_file)
+                LOGGER.info("Connection confirmed to UPS : %s", conf_file)
 
                 break
 
             except ConnectionRefusedError:
-                logs.GENERAL_LOGGER.error("Connection refused to UPS : %s", conf_file)
+                LOGGER.error("Connection refused to UPS : %s", conf_file)
                 apc_process.kill()
                 start_daemon(conf_file)
 

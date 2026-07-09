@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=../schemas/lazarus.json
+---
+lazarus:
+
+  # manually feed jobs into lazarus by appending
+  # lines into this file in the pattern of :
+  # 'job_type,job_mode,trigger_date,trigger_time'
+
+  ingest_file: /tmp/ingest.csv
+
+  # timestamp format in which jobs should appear
+  # in 'jobs.json'. values for 'trigger_date' and
+  # 'trigger_time' used in ingest file additions
+  # must conform to these values.
+
+  format:
+    date: "%Y-%m-%d"
+    time: "%H:%M:%S"
+
+  # upload UPS metrics to Elastic stack every 
+  # 'elastic_interval' seconds.
+
+  elastic_interval: 10
+
+  # trigger window in seconds that a job can
+  # execute from the desired trigger time. this
+  # is because lazarus may not always be able to
+  # execute the job at the exact second it's
+  # configured to; this adds n seconds from that
+  # time so that the job may execute at any point
+  # within that interval.
+
+  job_execute_delta: 60
+
+  power:
+
+    # if any ups device has a status of 'ONBATT' totaling
+    # 'trigger.status' seconds within a period of
+    # 'trigger.event' seconds, trigger event exists.
+
+    trigger:
+      status: 240
+      event: 300
+
+    # if all ups devices have a status of 'ONLINE' totaling
+    # 'trigger.status' seconds within a period of
+    # 'trigger.event' seconds, clear event exists.
+
+    clear:
+      status: 1200
+      event: 1800

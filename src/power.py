@@ -12,6 +12,8 @@ import datafile
 import apc
 import jobs
 
+LOGGER = logs.logging.getLogger(__name__)
+
 def add_event(event_type: str, event_mode: str):
     """
     Run tasks to create power event which
@@ -19,12 +21,12 @@ def add_event(event_type: str, event_mode: str):
     'trigger' or 'clear'.
     """
 
-    logs.GENERAL_LOGGER.info("Power event has been confirmed : %s", event_type)
+    LOGGER.info("Power event has been confirmed : %s", event_type)
 
     power_object = create_object(event_mode)
     added_list   = jobs.add_object(power_object)
 
-    datafile.write_json(constants.JOBS_PATH, added_list)
+    datafile.write_json(constants.JOBS_FILE, added_list)
 
 def determine_event(status_value: str, combined_metrics: list, mode_counter: tuple):
     """
@@ -43,36 +45,41 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
     power_lock = os.path.join(constants.DATA_DIR, "power.lock")
 
     if status_value == "ONBATT":
-        event_interval  = constants.POWER_TRIGGER_EVENT_INTERVAL
         status_interval = constants.POWER_TRIGGER_STATUS_INTERVAL
+        event_interval  = constants.POWER_TRIGGER_EVENT_INTERVAL
 
         if apc.ensure_status_any("ONBATT", combined_metrics):
             status_counter += 1
             event_counter  += 1
 
-            if status_counter == 1:
-                if not os.path.isfile(power_lock):
-                    logs.GENERAL_LOGGER.info("Power trigger event detected")
-
         else:
             if event_counter >= 1:
                 event_counter += 1
 
+        LOGGER.info(
+            "Qualifying power trigger event : %s",
+            "status ( " + str(status_counter) + " ) | " + \
+            "event ( " + str(event_counter) + " )"
+        )
+
     elif status_value == "ONLINE":
-        event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
         status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
+        event_interval  = constants.POWER_CLEAR_EVENT_INTERVAL
 
         if os.path.isfile(power_lock):
             if apc.ensure_status_all("ONLINE", combined_metrics):
                 status_counter += 1
                 event_counter  += 1
 
-                if status_counter == 1:
-                    logs.GENERAL_LOGGER.info("Power clear event detected")
-
             else:
                 if event_counter >= 1:
                     event_counter += 1
+
+            LOGGER.info(
+                "Qualifying power clear event : %s",
+                "status ( " + str(status_counter) + " ) | " + \
+                "event ( " + str(event_counter) + " )"
+            )
 
     if event_counter == event_interval:
         if status_counter >= status_interval:
@@ -92,7 +99,7 @@ def create_object(job_mode: str):
     job_id      = datafile.generate_id()
     job_trigger = datetime.now().replace(microsecond=0)
 
-    logs.GENERAL_LOGGER.info("Creating power job : %s", job_id)
+    LOGGER.info("Creating power job : %s", job_id)
 
     return {
         "id": job_id,

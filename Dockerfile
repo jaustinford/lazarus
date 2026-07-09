@@ -25,10 +25,11 @@ RUN \
         apcupsd
 
 RUN \
-    pip install \
+    pip3 install \
+        pyyaml \
         apcaccess \
         hvac \
-        elasticsearch==8.13.0
+        elasticsearch==9.1.3
 
 WORKDIR /lazarus
 

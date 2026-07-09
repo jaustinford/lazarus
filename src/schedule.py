@@ -9,6 +9,8 @@ import constants
 import logs
 import datafile
 
+LOGGER = logs.logging.getLogger(__name__)
+
 def increment_days(trigger_date: str, schedule_type: str):
     """
     Return date string adding the
@@ -31,7 +33,7 @@ def increment_days(trigger_date: str, schedule_type: str):
     delta_date_string = delta_date_dt.strftime(constants.DATE_FORMAT)
     job_delta_string  = schedule_type + " - " + delta_date_string
 
-    logs.GENERAL_LOGGER.info("Incrementing scheduled job by days : %s", job_delta_string)
+    LOGGER.info("Incrementing scheduled job by days : %s", job_delta_string)
 
     return delta_date_string
 
@@ -54,7 +56,7 @@ def increment_hours(trigger_time: str, schedule_type: str):
     delta_time_string = delta_time_dt.strftime(constants.TIME_FORMAT)
     job_time_string   = schedule_type + " - " + delta_time_string
 
-    logs.GENERAL_LOGGER.info("Incrementing scheduled job by hours : %s", job_time_string)
+    LOGGER.info("Incrementing scheduled job by hours : %s", job_time_string)
 
     return delta_time_string
 
@@ -81,7 +83,7 @@ def create_object(job_object: object):
         incremented_days  = job_trigger_date
         incremented_hours = increment_hours(job_trigger_time, schedule_type_join)
 
-    logs.GENERAL_LOGGER.info("Creating schedule job : %s", job_id)
+    LOGGER.info("Creating schedule job : %s", job_id)
 
     return {
         "id": job_id,

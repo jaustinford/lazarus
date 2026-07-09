@@ -10,6 +10,8 @@ import string
 
 import logs
 
+LOGGER = logs.logging.getLogger(__name__)
+
 def generate_id(string_length: int=40):
     """
     Create a random string given
@@ -35,7 +37,8 @@ def create_json(file_path: str):
     file_name = os.path.basename(file_path).split('.')[-2]
 
     if not os.path.isfile(file_path):
-        logs.GENERAL_LOGGER.info("Creating %s", file_name + " file : " + file_path)
+        LOGGER.info("Creating %s", file_name + " file : " + file_path)
+
         with open(file_path, "w", encoding="utf-8") as file_opened:
             file_opened.write(
                 json.dumps(
