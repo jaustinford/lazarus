@@ -7,7 +7,7 @@ import os
 from elasticsearch import Elasticsearch
 
 import logs
-import infra.vsecrets
+import infra.hvault
 
 def connect_elasticsearch():
     """
@@ -15,11 +15,20 @@ def connect_elasticsearch():
     endpoint, pass if can't connect.
     """
 
+    if not os.environ.get("ELASTICSEARCH_USER") or not os.environ.get("ELASTICSEARCH_PASS"):
+        logs.GENERAL_LOGGER.info("Resolving Vault secret : lazarus")
+
+        vault_token        = infra.hvault.approle_login("lazarus")
+        elasticsearch_auth = infra.hvault.get_secret(vault_token, "containers/elasticsearch/users/elastic")
+
+        os.environ["ELASTICSEARCH_USER"] = elasticsearch_auth["USERNAME"]
+        os.environ["ELASTICSEARCH_PASS"] = elasticsearch_auth["PASSWORD"]
+
     es_client = Elasticsearch(
         "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
         basic_auth=(
-            infra.vsecrets.ELASTICSEARCH_USER,
-            infra.vsecrets.ELASTICSEARCH_PASS
+            os.environ.get("ELASTICSEARCH_USER"),
+            os.environ.get("ELASTICSEARCH_PASS")
         )
     )
 

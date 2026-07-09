@@ -4,9 +4,9 @@ library and manage daemon.
 """
 
 import os
-import time
+import subprocess
 from datetime import datetime, timezone
-from apcaccess import status
+import apcaccess
 
 import constants
 import logs
@@ -45,14 +45,24 @@ def start_daemon(conf_file: str):
     localhost TCP port.
     """
 
-    logs.GENERAL_LOGGER.info("Starting APC daemon : %s", conf_file)
+    while True:
+        try:
+            apc_process = subprocess.Popen(
+                [
+                    "/sbin/apcupsd",
+                    "-f",
+                    conf_file
+                ]
+            )
 
-    os.system(
-        "/sbin/apcupsd \
-            -f " + conf_file
-    )
+            get_metrics(conf_file)
+            logs.GENERAL_LOGGER.info("Connection confirmed for APC : %s", conf_file)
 
-    time.sleep(10)
+            break
+
+        except ConnectionRefusedError:
+            logs.GENERAL_LOGGER.error("Connection refused for APC : %s", conf_file)
+            apc_process.kill()
 
 def ensure_status_all(status_value: str, combined_metrics: list):
     """
@@ -117,20 +127,12 @@ def get_metrics(conf_file: str):
 
     daemon_port = find_ups_nisport(conf_file)
 
-    while True:
-        try:
-            ups_metrics = status.parse(
-                status.get(
-                    host="localhost",
-                    port=daemon_port
-                )
-            )
-
-            break
-
-        except ConnectionRefusedError:
-            logs.GENERAL_LOGGER.error("Connection refused for APC : %s", str(daemon_port))
-            start_daemon(conf_file)
+    ups_metrics = apcaccess.status.parse(
+        apcaccess.status.get(
+            host="localhost",
+            port=daemon_port
+        )
+    )
 
     return ups_metrics
 
