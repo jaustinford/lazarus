@@ -4,7 +4,7 @@ lazarus:
 
   # manually feed jobs into lazarus by appending
   # lines into this file in the pattern of :
-  # 'job_type,job_mode,trigger_date,trigger_time'
+  # 'job_type,job_mode,trigger_date,trigger_time'.
 
   ingest_file: /tmp/ingest.csv
 

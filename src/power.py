@@ -48,20 +48,21 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
         status_interval = constants.POWER_TRIGGER_STATUS_INTERVAL
         event_interval  = constants.POWER_TRIGGER_EVENT_INTERVAL
 
-        if apc.ensure_status_any("ONBATT", combined_metrics):
-            status_counter += 1
-            event_counter  += 1
+        if not os.path.isfile(power_lock):
+            if apc.ensure_status_any("ONBATT", combined_metrics):
+                status_counter += 1
+                event_counter  += 1
 
-        else:
-            if event_counter >= 1:
-                event_counter += 1
+            else:
+                if event_counter >= 1:
+                    event_counter += 1
 
-        if apc.ensure_status_any("ONBATT", combined_metrics):
-            LOGGER.info(
-                "Qualifying power trigger event : %s",
-                "status ( " + str(status_counter) + " ) | " + \
-                "event ( " + str(event_counter) + " )"
-            )
+            if apc.ensure_status_any("ONBATT", combined_metrics):
+                LOGGER.info(
+                    "Qualifying power trigger event : %s",
+                    "status ( " + str(status_counter) + " ) | " + \
+                    "event ( " + str(event_counter) + " )"
+                )
 
     elif status_value == "ONLINE":
         status_interval = constants.POWER_CLEAR_STATUS_INTERVAL
