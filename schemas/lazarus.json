@@ -34,12 +34,14 @@
         "elastic_interval": {
           "type": "number",
           "description": "upload metrics to elastic every n seconds",
-          "pattern": "^(1|[0-9]{2})$"
+          "minimum": 5,
+          "maximum": 20
         },
         "job_execute_delta": {
           "type": "number",
           "description": "execute jobs at trigger time + execute delta",
-          "pattern": "^([5-9]|[0-9]{2})$"
+          "minimum": 5,
+          "maximum": 60
         },
         "power": {
           "type": "object",
@@ -52,12 +54,14 @@
                 "status": {
                   "type": "number",
                   "description": "seconds where status is 'ONBATT'",
-                  "pattern": "^([0-9]{3})$"
+                  "minimum": 240,
+                  "maximum": 480
                 },
                 "event": {
                   "type": "number",
                   "description": "total seconds to evaluate trigger event",
-                  "pattern": "^([0-9]{3})$"
+                  "minimum": 300,
+                  "maximum": 600
                 }
               },
               "required": [
@@ -72,12 +76,14 @@
                 "status": {
                   "type": "number",
                   "description": "seconds where status is 'ONLINE'",
-                  "pattern": "^([0-9]{4})$"
+                  "minimum": 480,
+                  "maximum": 2880
                 },
                 "event": {
                   "type": "number",
                   "description": "total seconds to evaluate clear event",
-                  "pattern": "^([0-9]{4})$"
+                  "minimum": 600,
+                  "maximum": 3600
                 }
               },
               "required": [

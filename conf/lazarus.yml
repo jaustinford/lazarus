@@ -47,5 +47,5 @@ lazarus:
     # 'clear.event' seconds, clear event exists.
 
     clear:
-      status: 1200
-      event: 1800
+      status: 480
+      event: 600
