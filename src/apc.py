@@ -103,27 +103,6 @@ def ensure_status_any(status_value: str, combined_metrics: list):
 
     return status_ensured
 
-def ingest_elastic(combined_metrics: list):
-    """
-    Iterate over combined UPS metrics
-    and upload to Elasticsearch.
-    """
-
-    es_client = elastic.connect_elasticsearch()
-
-    if not es_client.indices.exists(index="apcups-metric-data"):
-        elastic.create_lifecycle_policy(es_client, "apcups")
-        elastic.create_index_template(es_client, "apcups")
-        es_client.indices.create_data_stream(name="apcups")
-
-    for combined_metric in combined_metrics:
-        es_client.index(
-            index="apcups",
-            document=combined_metric
-        )
-
-    es_client.close()
-
 def get_metrics(conf_file: str):
     """
     Poll the UPS for the latest metrics,

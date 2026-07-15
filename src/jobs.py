@@ -104,7 +104,7 @@ def trigger_object(trigger_date: str, trigger_time: str):
     trigger_datetime_string = trigger_date + "T" + trigger_time + "Z"
 
     real_time_dt   = datetime.now().replace(microsecond=0)
-    target_time_dt = datetime.strptime(trigger_datetime_string, constants.DATETIME_FORMAT)
+    target_time_dt = datetime.strptime(trigger_datetime_string, constants.DOC_FORMAT_TIMEDATE)
     delta_time_dt  = target_time_dt + timedelta(seconds=constants.JOB_EXECUTE_DELTA)
 
     if real_time_dt >= target_time_dt:

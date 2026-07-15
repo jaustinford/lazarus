@@ -17,7 +17,7 @@ def increment_days(trigger_date: str, schedule_type: str):
     'trigger_date', in days.
     """
 
-    job_mode_dt = datetime.strptime(trigger_date, constants.DATE_FORMAT)
+    job_mode_dt = datetime.strptime(trigger_date, constants.LOGGING_FORMAT_DATE)
 
     if schedule_type == "daily":
         delta_date_dt = job_mode_dt + timedelta(days=1)
@@ -29,7 +29,7 @@ def increment_days(trigger_date: str, schedule_type: str):
         delta_date_days = int(schedule_type.split(":")[1])
         delta_date_dt   = job_mode_dt + timedelta(days=delta_date_days)
 
-    delta_date_string = delta_date_dt.strftime(constants.DATE_FORMAT)
+    delta_date_string = delta_date_dt.strftime(constants.LOGGING_FORMAT_DATE)
     job_delta_string  = schedule_type + " - " + delta_date_string
 
     MAIN_LOG.info("Incrementing scheduled job by days : %s", job_delta_string)
@@ -43,7 +43,7 @@ def increment_hours(trigger_time: str, schedule_type: str):
     'trigger_time', in hours.
     """
 
-    job_mode_dt = datetime.strptime(trigger_time, constants.TIME_FORMAT)
+    job_mode_dt = datetime.strptime(trigger_time, constants.LOGGING_FORMAT_TIME)
 
     if schedule_type == "hourly":
         delta_time_dt = job_mode_dt + timedelta(hours=1)
@@ -52,7 +52,7 @@ def increment_hours(trigger_time: str, schedule_type: str):
         delta_time_hours = int(schedule_type.split(":")[1])
         delta_time_dt    = job_mode_dt + timedelta(hours=delta_time_hours)
 
-    delta_time_string = delta_time_dt.strftime(constants.TIME_FORMAT)
+    delta_time_string = delta_time_dt.strftime(constants.LOGGING_FORMAT_TIME)
     job_time_string   = schedule_type + " - " + delta_time_string
 
     MAIN_LOG.info("Incrementing scheduled job by hours : %s", job_time_string)
