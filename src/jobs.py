@@ -9,10 +9,9 @@ import re
 from datetime import datetime, timedelta
 
 import constants
-import logs
 import datafile
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
 def find_locks():
     """
@@ -46,14 +45,14 @@ def manage_lock(lock_mode: str, job_object: object):
 
     if lock_mode == "add":
         if not os.path.isfile(job_lock):
-            LOGGER.info("Creating lock file : %s", job_lock)
+            MAIN_LOG.info("Creating lock file : %s", job_lock)
 
             with open(job_lock, "w", encoding="utf-8") as down_lock_opened:
                 down_lock_opened.write(job_object["id"])
 
     elif lock_mode == "remove":
         if os.path.isfile(job_lock):
-            LOGGER.info("Removing lock file : %s", job_lock)
+            MAIN_LOG.info("Removing lock file : %s", job_lock)
 
             os.remove(job_lock)
 
@@ -70,7 +69,7 @@ def add_object(job_object: object):
     for file_object in datafile.read_json(constants.JOBS_FILE):
         added_list.append(file_object)
 
-    LOGGER.info("Adding object to jobs.json : %s", job_id)
+    MAIN_LOG.info("Adding object to jobs.json : %s", job_id)
     added_list.append(job_object)
 
     return added_list
@@ -89,7 +88,7 @@ def remove_object(job_object: object):
         if file_object["id"] != job_id:
             removed_list.append(file_object)
 
-    LOGGER.info("Removing object from jobs.json : %s", job_id)
+    MAIN_LOG.info("Removing object from jobs.json : %s", job_id)
 
     return removed_list
 
@@ -110,7 +109,7 @@ def trigger_object(trigger_date: str, trigger_time: str):
 
     if real_time_dt >= target_time_dt:
         if real_time_dt < delta_time_dt:
-            LOGGER.info("Trigger event has occured")
+            MAIN_LOG.info("Trigger event has occured")
             should_run = True
 
     return should_run

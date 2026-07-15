@@ -7,12 +7,11 @@ import os
 from datetime import datetime
 
 import constants
-import logs
 import datafile
 import apc
 import jobs
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
 def add_event(event_type: str, event_mode: str):
     """
@@ -21,7 +20,7 @@ def add_event(event_type: str, event_mode: str):
     'trigger' or 'clear'.
     """
 
-    LOGGER.info("Power event has been confirmed : %s", event_type)
+    MAIN_LOG.info("Power event has been confirmed : %s", event_type)
 
     power_object = create_object(event_mode)
     added_list   = jobs.add_object(power_object)
@@ -58,7 +57,7 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
                     event_counter += 1
 
             if apc.ensure_status_any("ONBATT", combined_metrics):
-                LOGGER.info(
+                MAIN_LOG.info(
                     "Qualifying power trigger event : %s",
                     "status ( " + str(status_counter) + " ) | " + \
                     "event ( " + str(event_counter) + " )"
@@ -78,7 +77,7 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
                     event_counter += 1
 
             if apc.ensure_status_all("ONLINE", combined_metrics):
-                LOGGER.info(
+                MAIN_LOG.info(
                     "Qualifying power clear event : %s",
                     "status ( " + str(status_counter) + " ) | " + \
                     "event ( " + str(event_counter) + " )"
@@ -102,7 +101,7 @@ def create_object(job_mode: str):
     job_id      = datafile.generate_id()
     job_trigger = datetime.now().replace(microsecond=0)
 
-    LOGGER.info("Creating power job : %s", job_id)
+    MAIN_LOG.info("Creating power job : %s", job_id)
 
     return {
         "id": job_id,

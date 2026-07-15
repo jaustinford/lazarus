@@ -4,11 +4,10 @@ authorized secrets using the AppRole
 authentication method.
 """
 
-import os
 import json
 import hvac
 
-VAULT_URL = "http://" + os.environ.get("VAULT_ENDPOINT")
+import constants
 
 def read_approle(approle_file: str):
     """
@@ -31,7 +30,7 @@ def approle_login(approle_name: str):
     from /root/approle on the host.
     """
 
-    vault_unauth_client = hvac.Client(url=VAULT_URL)
+    vault_unauth_client = hvac.Client(url=constants.VAULT_ENDPOINT)
     approle_credentials = read_approle(approle_name + ".json")
 
     client_token = vault_unauth_client.auth.approle.login(
@@ -49,7 +48,7 @@ def get_secret(vault_token: str, secret_path: str):
     """
 
     vault_auth_client = hvac.Client(
-        url=VAULT_URL,
+        url=constants.VAULT_ENDPOINT,
         token=vault_token
     )
 

@@ -10,10 +10,9 @@ from datetime import datetime, timezone
 from apcaccess import status
 
 import constants
-import logs
 import elastic
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
 def service_init():
     """
@@ -61,12 +60,12 @@ def start_daemon(conf_file: str):
         while True:
             try:
                 get_metrics(conf_file)
-                LOGGER.info("Connection confirmed to UPS : %s", conf_file)
+                MAIN_LOG.info("Connection confirmed to UPS : %s", conf_file)
 
                 break
 
             except ConnectionRefusedError:
-                LOGGER.error("Connection refused to UPS : %s", conf_file)
+                MAIN_LOG.error("Connection refused to UPS : %s", conf_file)
                 apc_process.kill()
                 start_daemon(conf_file)
 
@@ -186,7 +185,7 @@ def combine_metrics(conf_dir: str):
                 "timeleft": metric_timeleft,
                 "bcharge": ups_metrics["BCHARGE"].split(" ")[0],
                 "loadpct": ups_metrics["LOADPCT"].split(" ")[0],
-                "@timestamp": datetime.now(timezone.utc).strftime(constants.DATETIME_FORMAT)
+                "@timestamp": datetime.now(timezone.utc).strftime(constants.DOC_FORMAT_TIMEDATE)
             }
         )
 

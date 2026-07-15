@@ -1,120 +1,89 @@
 """
-Ingest combined UPS metric data
-into Elasticsearch.
+Create resources required for Elastic
+stack ingestion and uploading data.
 """
 
 import os
 from elasticsearch import Elasticsearch
 
-import logs
-import infra.hvault
+import constants
+import hvault
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
-def connect_elasticsearch():
+def create_client(index_root_name: str):
     """
-    Attempt a connection to an elasticsearch
-    endpoint, pass if can't connect.
+    Resolve Elastic secrets and create
+    connection object.
     """
 
-    if not os.environ.get("ELASTICSEARCH_USER") or not os.environ.get("ELASTICSEARCH_PASS"):
-        vault_token = infra.hvault.approle_login("lazarus")
+    if not os.environ.get("ELASTIC_USERNAME") or not os.environ.get("ELASTIC_PASSWORD"):
+        vault_token = hvault.approle_login(index_root_name)
 
-        elasticsearch_auth = infra.hvault.get_secret(
+        elastic_auth = hvault.get_secret(
             vault_token,
             "containers/elasticsearch/users/elastic"
         )
 
-        os.environ["ELASTICSEARCH_USER"] = elasticsearch_auth["USERNAME"]
-        os.environ["ELASTICSEARCH_PASS"] = elasticsearch_auth["PASSWORD"]
+        os.environ["ELASTIC_USERNAME"] = elastic_auth["USERNAME"]
+        os.environ["ELASTIC_PASSWORD"] = elastic_auth["PASSWORD"]
 
     es_client = Elasticsearch(
-        "http://" + os.environ.get("ELASTICSEARCH_ENDPOINT"),
+        constants.ELASTIC_ENDPOINT,
         basic_auth=(
-            os.environ.get("ELASTICSEARCH_USER"),
-            os.environ.get("ELASTICSEARCH_PASS")
+            os.environ.get("ELASTIC_USERNAME"),
+            os.environ.get("ELASTIC_PASSWORD")
         )
     )
 
+    initialize_index(es_client, index_root_name)
+
     return es_client
+
+def initialize_index(es_client: Elasticsearch, index_root_name: str):
+    """
+    Create Elastic Index resources if
+    'index_root_name + "-metric-data"'
+    does not exist.
+    """
+
+    if not es_client.indices.exists(index=index_root_name + "-metric-data"):
+        create_lifecycle_policy(es_client, index_root_name)
+        create_index_template(es_client, index_root_name)
+        es_client.indices.create_data_stream(name=index_root_name)
 
 def create_lifecycle_policy(es_client: Elasticsearch, index_root_name: str):
     """
-    Set up a rollover index management
-    policy for the index.
+    Create Elastic Lifecycle Policy.
     """
-
-    LOGGER.info("Creating Lifecycle Policy : %s", index_root_name)
 
     es_client.ilm.put_lifecycle(
         name=index_root_name + "-policy",
-        body={
-            "policy": {
-                "phases": {
-                    "hot": {
-                        "actions": {
-                            "rollover": {
-                                "max_age": "30d",
-                                "max_size": "50gb"
-                            }
-                        }
-                    },
-                    "delete": {
-                        "min_age": "30d",
-                        "actions": {
-                            "delete": {}
-                        }
-                    }
-                }
-            }
-        }
+        body=constants.ELASTIC_POLICY_READ
     )
+
+    MAIN_LOG.info("Created Lifecycle Policy : %s", index_root_name)
 
 def create_index_template(es_client: Elasticsearch, index_root_name: str):
     """
-    Create Elasticsearch Index Template.
+    Create Elastic Index Template.
     """
-
-    LOGGER.info("Creating Index Template : %s", index_root_name)
 
     es_client.indices.put_index_template(
         name=index_root_name,
-        body={
-            "index_patterns": [index_root_name + "*"],
-            "data_stream": {},
-            "template": {
-                "aliases": {
-                    index_root_name + "-metric-data": {}
-                },
-                "settings": {
-                    "number_of_shards": 1,
-                    "number_of_replicas": 0,
-                    "index.lifecycle.name": index_root_name + "-policy",
-                    "index.lifecycle.rollover_alias": index_root_name + "-metric-data"
-                },
-                "mappings": {
-                    "properties": {
-                        "upsname": {
-                            "type": "keyword"
-                        },
-                        "status": {
-                            "type": "keyword"
-                        },
-                        "timeleft": {
-                            "type": "float"
-                        },
-                        "bcharge": {
-                            "type": "float"
-                        },
-                        "loadpct": {
-                            "type": "float"
-                        },
-                        "@timestamp": {
-                            "type": "date",
-                            "format": "date_time_no_millis"
-                        }
-                    }
-                }
-            }
-        }
+        body=constants.ELASTIC_TEMPLATE_READ
     )
+
+    MAIN_LOG.info("Created Index Template : %s", index_root_name)
+
+def upload_document(es_client: Elasticsearch, index_root_name: str, index_document: object):
+    """
+    Upload document to Elastic.
+    """
+
+    es_client.index(
+        index=index_root_name,
+        document=index_document
+    )
+
+    MAIN_LOG.info("Uploaded Elastic Document : %s", index_document)

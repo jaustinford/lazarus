@@ -8,9 +8,9 @@ import json
 import random
 import string
 
-import logs
+import constants
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
 def generate_id(string_length: int=40):
     """
@@ -37,7 +37,7 @@ def create_json(file_path: str):
     file_name = os.path.basename(file_path).split('.')[-2]
 
     if not os.path.isfile(file_path):
-        LOGGER.info("Creating %s", file_name + " file : " + file_path)
+        MAIN_LOG.info("Creating %s", file_name + " file : " + file_path)
 
         with open(file_path, "w", encoding="utf-8") as file_opened:
             file_opened.write(

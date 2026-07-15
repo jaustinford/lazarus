@@ -1,0 +1,40 @@
+{
+  "index_patterns": [
+    "apcups*"
+  ],
+  "data_stream": {},
+  "template": {
+    "aliases": {
+      "apcups-metric-data": {}
+    },
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.lifecycle.name": "apcups-policy",
+      "index.lifecycle.rollover_alias": "apcups-metric-data"
+    },
+    "mappings": {
+      "properties": {
+        "upsname": {
+          "type": "keyword"
+        },
+        "status": {
+          "type": "keyword"
+        },
+        "timeleft": {
+          "type": "float"
+        },
+        "bcharge": {
+          "type": "float"
+        },
+        "loadpct": {
+          "type": "float"
+        },
+        "@timestamp": {
+          "type": "date",
+          "format": "date_time_no_millis"
+        }
+      }
+    }
+  }
+}

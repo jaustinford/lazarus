@@ -27,14 +27,12 @@ RUN \
 RUN \
     pip3 install \
         pyyaml \
-        apcaccess \
         hvac \
-        elasticsearch==9.1.3
+        elasticsearch==9.1.3 \
+        apcaccess
 
 WORKDIR /lazarus
 
-COPY --chmod=755 \
-    src/ ./src/
-
-COPY --chmod=755 \
-    conf/ ./conf/
+COPY src/ ./src/
+COPY conf/ ./conf/
+COPY elastic/ ./elastic/

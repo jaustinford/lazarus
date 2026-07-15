@@ -2,20 +2,16 @@
 ---
 lazarus:
 
+  # set the sleep in seconds in between project
+  # loops.
+
+  loop_interval: 1
+
   # manually feed jobs into lazarus by appending
   # lines into this file in the pattern of :
   # 'job_type,job_mode,trigger_date,trigger_time'.
 
   ingest_file: /tmp/ingest.csv
-
-  # timestamp format in which jobs should appear
-  # in 'jobs.json'. values for 'trigger_date' and
-  # 'trigger_time' used in ingest file additions
-  # must conform to these values.
-
-  format:
-    date: "%Y-%m-%d"
-    time: "%H:%M:%S"
 
   # upload ups metrics to elastic stack every 
   # 'elastic_interval' seconds.
@@ -49,3 +45,12 @@ lazarus:
     clear:
       status: 480
       event: 600
+
+  # project logging values for the 'MAIN_LOG'
+  # object.
+
+  logging:
+    format:
+      banner: "%(asctime)s [ %(levelname)s ] %(name)s - %(message)s"
+      date: "%Y-%m-%d"
+      time: "%H:%M:%S"

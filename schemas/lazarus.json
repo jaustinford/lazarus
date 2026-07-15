@@ -6,30 +6,16 @@
       "type": "object",
       "description": "parent object",
       "properties": {
+        "loop_interval": {
+          "type": "number",
+          "description": "time to sleep in between loop iterations",
+          "minimum": 1,
+          "maximum": 120
+        },
         "ingest_file": {
           "type": "string",
           "description": "location of ingest file",
           "pattern": "^/tmp/[a-z0-9]+.csv$"
-        },
-        "format": {
-          "type": "object",
-          "description": "define timestamp formats",
-          "properties": {
-            "date": {
-              "type": "string",
-              "description": "format for job date string",
-              "pattern": "^%Y(-|_|:)%m(-|_|:)%d$"
-            },
-            "time": {
-              "type": "string",
-              "description": "format for job time string",
-              "pattern": "^%H(-|_|:)%M(-|_|:)%S$"
-            }
-          },
-          "required": [
-            "date",
-            "time"
-          ]
         },
         "elastic_interval": {
           "type": "number",
@@ -96,14 +82,47 @@
             "trigger",
             "clear"
           ]
+        },
+        "logging": {
+          "type": "object",
+          "description": "configure project logging",
+          "properties": {
+            "format": {
+              "type": "object",
+              "description": "log formatting timestamp",
+              "properties": {
+                "banner": {
+                  "type": "string",
+                  "description": "banner format for logs"
+                },
+                "date": {
+                  "type": "string",
+                  "description": "log formatting timestamp date element",
+                  "pattern": "^%Y(-|_|:)%m(-|_|:)%d$"
+                },
+                "time": {
+                  "type": "string",
+                  "description": "log formatting timestamp time element",
+                  "pattern": "^%H(-|_|:)%M(-|_|:)%S$"
+                }
+              },
+              "required": [
+                "banner",
+                "date",
+                "time"
+              ]
+            }
+          },
+          "required": ["format"]
         }
       },
       "required": [
+        "loop_interval",
         "ingest_file",
-        "format",
         "elastic_interval",
         "job_execute_delta",
-        "power"
+        "power",
+        "logging"
       ]
     }
   }

@@ -29,7 +29,7 @@ def main():
         execute.process_ingest()
         execute.process_jobs()
 
-        time.sleep(1)
+        time.sleep(constants.LOOP_INTERVAL)
 
 if __name__ == "__main__":
     main()

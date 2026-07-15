@@ -6,15 +6,14 @@ objects within jobs.json.
 import os
 
 import constants
-import logs
 import datafile
 import ingest
-import apc
+import elastic
 import jobs
 import schedule
 import power
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
 def run_cycle(job_mode: str):
     """
@@ -22,7 +21,7 @@ def run_cycle(job_mode: str):
     CYCLE_MODE as either 'up' or 'down'.
     """
 
-    LOGGER.info("Executing IAC-Configure in %s", job_mode + " mode")
+    MAIN_LOG.info("Executing IAC-Configure in %s", job_mode + " mode")
     os.environ["CYCLE_MODE"] = job_mode
 
     if job_mode == "up":
@@ -33,7 +32,7 @@ def run_cycle(job_mode: str):
         os.system("docker start site-down")
         os.system("docker wait site-down")
 
-    LOGGER.info("Completed IAC-Configure in %s", job_mode + " mode")
+    MAIN_LOG.info("Completed IAC-Configure in %s", job_mode + " mode")
 
 def process_mode(job_object: object):
     """
@@ -89,11 +88,17 @@ def process_elastic(combined_metrics: list, elastic_counter: int):
     """
 
     if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
-        for combined_metric in combined_metrics:
-            LOGGER.info("UPS metrics found : %s", str(combined_metric))
-
         if not jobs.find_locks():
-            apc.ingest_elastic(combined_metrics)
+            es_client = elastic.create_client("apcups")
+
+            for combined_metric in combined_metrics:
+                elastic.upload_document(
+                    es_client,
+                    "apcups",
+                    combined_metric
+                )
+
+            es_client.close()
 
         elastic_counter = 0
 

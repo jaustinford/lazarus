@@ -6,10 +6,10 @@ create into objects for jobs.json.
 
 import os
 
-import logs
+import constants
 import datafile
 
-LOGGER = logs.logging.getLogger(__name__)
+MAIN_LOG = constants.logging.getLogger(__name__)
 
 def create_file(file_path: str):
     """
@@ -20,7 +20,7 @@ def create_file(file_path: str):
     file_name = os.path.basename(file_path).split('.')[-2]
 
     if not os.path.isfile(file_path):
-        LOGGER.info("Creating %s", file_name + " file : " + file_path)
+        MAIN_LOG.info("Creating %s", file_name + " file : " + file_path)
         with open(file_path, "w", encoding="utf-8") as file_opened:
             file_opened.write("")
 
@@ -52,7 +52,7 @@ def create_jobs(file_readlines: list):
         line_date = file_readline.split(",")[2]
         line_time = file_readline.split(",")[3].rstrip("\n")
 
-        LOGGER.info("Ingesting job : %s", line_id)
+        MAIN_LOG.info("Ingesting job : %s", line_id)
 
         ingest_job_list.append(
             {
