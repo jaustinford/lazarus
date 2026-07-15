@@ -89,12 +89,12 @@ def process_elastic(combined_metrics: list, elastic_counter: int):
 
     if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
         if not jobs.find_locks():
-            es_client = elastic.create_client("apcups")
+            es_client = elastic.create_client("lazarus")
 
             for combined_metric in combined_metrics:
                 elastic.upload_document(
                     es_client,
-                    "apcups",
+                    "lazarus",
                     combined_metric
                 )
 

@@ -1,17 +1,17 @@
 {
   "index_patterns": [
-    "apcups*"
+    "lazarus*"
   ],
   "data_stream": {},
   "template": {
     "aliases": {
-      "apcups-metric-data": {}
+      "lazarus-metric-data": {}
     },
     "settings": {
       "number_of_shards": 1,
       "number_of_replicas": 0,
-      "index.lifecycle.name": "apcups-policy",
-      "index.lifecycle.rollover_alias": "apcups-metric-data"
+      "index.lifecycle.name": "lazarus-policy",
+      "index.lifecycle.rollover_alias": "lazarus-metric-data"
     },
     "mappings": {
       "properties": {
