@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 from apcaccess import status
 
 import constants
-import elastic
 
 MAIN_LOG = constants.logging.getLogger(__name__)
 
