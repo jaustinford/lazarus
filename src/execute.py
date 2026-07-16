@@ -8,7 +8,7 @@ import os
 import constants
 import datafile
 import ingest
-import elastic
+import tpl.elastic
 import jobs
 import schedule
 import power
@@ -89,10 +89,10 @@ def process_elastic(combined_metrics: list, elastic_counter: int):
 
     if elastic_counter == constants.ELASTIC_INGEST_INTERVAL:
         if not jobs.find_locks():
-            es_client = elastic.create_client("lazarus")
+            es_client = tpl.elastic.create_client("lazarus")
 
             for combined_metric in combined_metrics:
-                elastic.upload_document(
+                tpl.elastic.upload_document(
                     es_client,
                     "lazarus",
                     combined_metric

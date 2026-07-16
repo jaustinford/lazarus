@@ -7,7 +7,7 @@ import os
 from elasticsearch import Elasticsearch
 
 import constants
-import hvault
+import tpl.vault
 
 MAIN_LOG = constants.logging.getLogger(__name__)
 
@@ -18,9 +18,9 @@ def create_client(index_root_name: str):
     """
 
     if not os.environ.get("ELASTIC_USERNAME") or not os.environ.get("ELASTIC_PASSWORD"):
-        vault_token = hvault.approle_login(index_root_name)
+        vault_token = tpl.vault.approle_login(index_root_name)
 
-        elastic_auth = hvault.get_secret(
+        elastic_auth = tpl.vault.get_secret(
             vault_token,
             "containers/elasticsearch/users/elastic"
         )
