@@ -4,7 +4,7 @@ variables:
     description: Must be one of 'manual', 'schedule:daily', 'schedule:weekly', 'schedule:customdays', 'schedule:hourly', or 'schedule:customhours'.
 
   ELISE_PIPELINE_JOB_MODE:
-    description: Must be one of 'down' or 'up'.
+    description: Must be one of 'full', 'down' or 'up'.
 
   ELISE_PIPELINE_JOB_TRIGGER_DATE:
     description: Must be in ISO-8601 date format ie. YYYY-MM-DD

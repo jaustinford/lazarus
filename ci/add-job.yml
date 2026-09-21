@@ -9,6 +9,6 @@ add_job:
   script:
     - |
       ssh $(echo 'cXVlZW4=' | base64 -d)@192.168.40.4 \
-          -i /automation/iac-configure.key \
+          -i /automation/host-mgmt.key \
           -o StrictHostKeyChecking=no \
           "echo \"${ELISE_PIPELINE_JOB_TYPE},${ELISE_PIPELINE_JOB_MODE},${ELISE_PIPELINE_JOB_TRIGGER_DATE},${ELISE_PIPELINE_JOB_TRIGGER_TIME}\" >> /tmp/ingest.csv"
