@@ -17,17 +17,17 @@ def increment_days(trigger_date: str, schedule_type: str):
     'trigger_date', in days.
     """
 
-    job_mode_dt = datetime.strptime(trigger_date, constants.LOGGING_FORMAT_DATE)
+    job_date_dt = datetime.strptime(trigger_date, constants.LOGGING_FORMAT_DATE)
 
     if schedule_type == "daily":
-        delta_date_dt = job_mode_dt + timedelta(days=1)
+        delta_date_dt = job_date_dt + timedelta(days=1)
 
     elif schedule_type == "weekly":
-        delta_date_dt = job_mode_dt + timedelta(days=7)
+        delta_date_dt = job_date_dt + timedelta(days=7)
 
     elif schedule_type.startswith("customdays"):
         delta_date_days = int(schedule_type.split(":")[1])
-        delta_date_dt   = job_mode_dt + timedelta(days=delta_date_days)
+        delta_date_dt   = job_date_dt + timedelta(days=delta_date_days)
 
     delta_date_string = delta_date_dt.strftime(constants.LOGGING_FORMAT_DATE)
     job_delta_string  = schedule_type + " - " + delta_date_string
@@ -43,14 +43,14 @@ def increment_hours(trigger_time: str, schedule_type: str):
     'trigger_time', in hours.
     """
 
-    job_mode_dt = datetime.strptime(trigger_time, constants.LOGGING_FORMAT_TIME)
+    job_date_dt = datetime.strptime(trigger_time, constants.LOGGING_FORMAT_TIME)
 
     if schedule_type == "hourly":
-        delta_time_dt = job_mode_dt + timedelta(hours=1)
+        delta_time_dt = job_date_dt + timedelta(hours=1)
 
     elif schedule_type.startswith("customhours"):
         delta_time_hours = int(schedule_type.split(":")[1])
-        delta_time_dt    = job_mode_dt + timedelta(hours=delta_time_hours)
+        delta_time_dt    = job_date_dt + timedelta(hours=delta_time_hours)
 
     delta_time_string = delta_time_dt.strftime(constants.LOGGING_FORMAT_TIME)
     job_time_string   = schedule_type + " - " + delta_time_string
@@ -67,7 +67,7 @@ def create_object(job_object: object):
 
     job_id           = datafile.generate_id()
     job_type         = job_object["type"]
-    job_mode         = job_object["mode"]
+    job_flow         = job_object["flow"]
     job_trigger_date = job_object["trigger"]["date"]
     job_trigger_time = job_object["trigger"]["time"]
 
@@ -87,7 +87,7 @@ def create_object(job_object: object):
     return {
         "id": job_id,
         "type": job_type,
-        "mode": job_mode,
+        "flow": job_flow,
         "trigger": {
             "date": incremented_days,
             "time": incremented_hours

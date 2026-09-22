@@ -48,7 +48,7 @@ def create_jobs(file_readlines: list):
     for file_readline in file_readlines:
         line_id   = datafile.generate_id()
         line_type = file_readline.split(",")[0]
-        line_mode = file_readline.split(",")[1]
+        line_flow = file_readline.split(",")[1]
         line_date = file_readline.split(",")[2]
         line_time = file_readline.split(",")[3].rstrip("\n")
 
@@ -58,7 +58,7 @@ def create_jobs(file_readlines: list):
             {
                 "id": line_id,
                 "type": line_type,
-                "mode": line_mode,
+                "flow": line_flow,
                 "trigger": {
                     "date": line_date,
                     "time": line_time

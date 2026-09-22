@@ -13,7 +13,7 @@ import jobs
 
 MAIN_LOG = constants.logging.getLogger(__name__)
 
-def add_event(event_type: str, event_mode: str):
+def add_event(event_type: str, event_flow: str):
     """
     Run tasks to create power event which
     can be one of two 'event_type's :
@@ -22,12 +22,12 @@ def add_event(event_type: str, event_mode: str):
 
     MAIN_LOG.info("Power event has been confirmed : %s", event_type)
 
-    power_object = create_object(event_mode)
+    power_object = create_object(event_flow)
     added_list   = jobs.add_object(power_object)
 
     datafile.write_json(constants.JOBS_FILE, added_list)
 
-def determine_event(status_value: str, combined_metrics: list, mode_counter: tuple):
+def determine_event(status_value: str, combined_metrics: list, combined_counter: tuple):
     """
     Increment counters to determine that
     'status_value' has maintained
@@ -38,8 +38,8 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
 
     should_trigger = False
 
-    status_counter = mode_counter[0]
-    event_counter  = mode_counter[1]
+    status_counter = combined_counter[0]
+    event_counter  = combined_counter[1]
 
     power_lock = os.path.join(constants.DATA_DIR, "power.lock")
 
@@ -92,7 +92,7 @@ def determine_event(status_value: str, combined_metrics: list, mode_counter: tup
 
     return (should_trigger, status_counter, event_counter)
 
-def create_object(job_mode: str):
+def create_object(job_flow: str):
     """
     Generate a power object against
     recently polled UPS metric data.
@@ -106,7 +106,7 @@ def create_object(job_mode: str):
     return {
         "id": job_id,
         "type": "power",
-        "mode": job_mode,
+        "flow": job_flow,
         "trigger": {
             "date": str(job_trigger.date()),
             "time": str(job_trigger.time())

@@ -114,7 +114,7 @@ def trigger_object(trigger_date: str, trigger_time: str):
 
     return should_run
 
-def find_object(job_type: str, job_mode: str):
+def find_object(job_type: str, job_flow: str):
     """
     Return true if object exists
     in jobs.json.
@@ -124,30 +124,30 @@ def find_object(job_type: str, job_mode: str):
 
     for file_object in datafile.read_json(constants.JOBS_FILE):
         object_type = file_object["type"]
-        object_mode = file_object["mode"]
+        object_flow = file_object["flow"]
 
         if object_type == job_type:
-            if object_mode == job_mode:
+            if object_flow == job_flow:
                 power_found = True
                 break
 
     return power_found
 
-def retrieve_object(job_type: str, job_mode: str):
+def retrieve_object(job_type: str, job_flow: str):
     """
     Return an existing object from
     jobs.json based on 'object_type'
-    and 'object_mode'.
+    and 'object_flow'.
     """
 
     found_object = {}
 
     for file_object in datafile.read_json(constants.JOBS_FILE):
         object_type = file_object["type"]
-        object_mode = file_object["mode"]
+        object_flow = file_object["flow"]
 
         if object_type == job_type:
-            if object_mode == job_mode:
+            if object_flow == job_flow:
                 found_object = file_object
                 break
 

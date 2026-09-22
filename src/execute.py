@@ -15,33 +15,27 @@ import power
 
 MAIN_LOG = constants.logging.getLogger(__name__)
 
-def run_cycle(job_mode: str):
+def run_cycle(playbook_flow: str):
     """
-    Run the IAC-Configure playbook given
-    CYCLE_MODE as either 'up' or 'down'.
+    Run the host-mgmt playbook flow
+    and wait for it to finish.
     """
 
-    MAIN_LOG.info("Executing IAC-Configure in %s", job_mode + " mode")
-    os.environ["CYCLE_MODE"] = job_mode
+    MAIN_LOG.info("Executing host-mgmt playbook flow : %s", playbook_flow)
 
-    if job_mode == "up":
-        os.system("docker start site-up")
-        os.system("docker wait site-up")
+    os.system("docker start site-" + playbook_flow)
+    os.system("docker wait site-" + playbook_flow)
 
-    elif job_mode == "down":
-        os.system("docker start site-down")
-        os.system("docker wait site-down")
+    MAIN_LOG.info("Completed host-mgmt playbook flow : %s", playbook_flow)
 
-    MAIN_LOG.info("Completed IAC-Configure in %s", job_mode + " mode")
-
-def process_mode(job_object: object):
+def process_flow(job_object: object):
     """
     Determine if timedate for object has
     been met, then manage lock and jobs.json
     files.
     """
 
-    job_mode         = job_object["mode"]
+    job_flow         = job_object["flow"]
     job_type         = job_object["type"]
     job_trigger_date = job_object["trigger"]["date"]
     job_trigger_time = job_object["trigger"]["time"]
@@ -49,17 +43,23 @@ def process_mode(job_object: object):
     if jobs.trigger_object(job_trigger_date, job_trigger_time):
         removed_list = jobs.remove_object(job_object)
 
-        if job_mode == "down":
+        if job_flow == "down":
             jobs.manage_lock("add", job_object)
             datafile.write_json(constants.JOBS_FILE, removed_list)
 
             if job_type.startswith("schedule"):
                 process_schedule(job_object)
 
-        run_cycle(job_mode)
+        run_cycle(job_flow)
 
-        if job_mode == "up":
+        if job_flow == "up":
             jobs.manage_lock("remove", job_object)
+            datafile.write_json(constants.JOBS_FILE, removed_list)
+
+            if job_type.startswith("schedule"):
+                process_schedule(job_object)
+
+        elif job_flow == "full":
             datafile.write_json(constants.JOBS_FILE, removed_list)
 
             if job_type.startswith("schedule"):
@@ -162,4 +162,4 @@ def process_jobs():
     datafile.create_json(constants.JOBS_FILE)
 
     for job_object in datafile.read_json(constants.JOBS_FILE):
-        process_mode(job_object)
+        process_flow(job_object)
