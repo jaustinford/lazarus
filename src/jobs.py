@@ -88,8 +88,6 @@ def remove_object(job_object: object):
         if file_object["id"] != job_id:
             removed_list.append(file_object)
 
-    MAIN_LOG.info("Removing object from jobs.json : %s", job_id)
-
     return removed_list
 
 def trigger_object(trigger_date: str, trigger_time: str):

@@ -24,9 +24,11 @@ def run_cycle(playbook_flow: str):
     MAIN_LOG.info("Executing host-mgmt playbook flow : %s", playbook_flow)
 
     os.system("docker start site-" + playbook_flow)
-    os.system("docker wait site-" + playbook_flow)
 
-    MAIN_LOG.info("Completed host-mgmt playbook flow : %s", playbook_flow)
+    if playbook_flow == "up" or playbook_flow == "down":
+        os.system("docker wait site-" + playbook_flow)
+
+        MAIN_LOG.info("Completed host-mgmt playbook flow : %s", playbook_flow)
 
 def process_flow(job_object: object):
     """
